@@ -1,0 +1,37 @@
+swagger: '2.0'
+info:
+  title: shortie
+  description: API for creating and managing short URLs
+  version: 1.0.0
+paths:
+  /api/shorten:
+    post:
+      summary: Create a new short URL
+      description: Creates a new short URL from a long URL
+      parameters:
+        - name: longUrl
+          in: body
+          required: true
+          schema:
+            type: string
+        - name: customAlias
+          in: body
+          schema:
+            type: string
+        - name: topic
+          in: body
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully created short URL
+          schema:
+            type: object
+            properties:
+              shortUrl:
+                type: string
+              createdAt:
+                type: string
+                format: date-time
+
+

@@ -3,11 +3,13 @@ import IUrl from '../models/url';
 import { v4 as uuidv4 } from 'uuid';
 import * as Redis from 'redis';
 import { IUser } from '../models/user';
+import 'dotenv/config';
 
 const router = Router();
 const redisClient = Redis.createClient();
 
-router.post('/api/shorten', async (req, res) => {
+
+router.post('/', async (req, res) => {
   try {
     const { longUrl, customAlias, topic } = req.body;
     const alias = customAlias || uuidv4().substring(0, 6);
@@ -31,7 +33,7 @@ router.post('/api/shorten', async (req, res) => {
   }
 });
 
-router.get('/api/shorten/:alias', async (req: Request, res) => {
+router.get('/:alias', async (req: Request, res) => {
   try {
     const alias = req.params.alias;
     const longUrl = await redisClient.get(alias);

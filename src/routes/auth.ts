@@ -3,56 +3,77 @@ import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 import { setRefreshToken, getTokenData } from '../utils/authUtils'
 import { IUser } from "../models/user";
+import 'dotenv/config';
 
 const router = Router();
 
-router.get('/auth', (req, res) => {
+router.get('/', (req, res) => {
+
+  console.log('process.env: ', process.env);
   res.send(`
+    <html>
+      <head>
+        <title>authentication</title>
+      ${process.env.DEVMODE== 'mobile' ? '<script src="https://cdn.jsdelivr.net/gh/c-kick/mobileConsole/hnl.mobileconsole.min.js"></script>' : ''}
+      </head>
+    <body>
     <h1>Login</h1>
+
     <button id="google-signin-button">Sign in with Google</button>
+    <p id='result'></p>
     <script>
       const googleSignInButton = document.getElementById('google-signin-button');
 
       googleSignInButton.addEventListener('click', async () => {
-        try {
-          const credential = await navigator.credentials.get({
-            federation: [{
-              provider: "${process.env.FEDCM_PROVIDER_URL}",
-            }],
+        console.log("click happened");
+        if (!navigator.credentials || !navigator.credentials.get) {
+          console.error('36 biradari no sapot');
+          console.log('36 biradari no sapot');
+          return
+        }
+
+        console.log("navigator credentials exists");
+        const credential = await navigator.credentials.get({
+          federated: {
+            providers: ["${process.env.FEDCM_PROVIDER_URL_GOOGLE}"],
+          },
+        });
+        console.log("credential made: ", credential);
+
+        if (credential) {
+          // Send the credential to your server for verification and session creation
+          const response = await fetch('/api/auth/google/fedcm/callback', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ token: credential.token }),
           });
 
-          if (credential) {
-            // Send the credential to your server for verification and session creation
-            const response = await fetch('/auth/google/fedcm/callback', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ token: credential.token }),
-            });
-
-            if (response.ok) {
-              const userData = await response.json(); // Get user data from the server
-              // Redirect or update the UI as needed (e.g., store userData in local storage or a cookie)
-              window.location.href = '/dashboard'; // Example: redirect to dashboard
-            } else {
-              const errorData = await response.json();
-              console.error("FedCM login failed:", errorData);
-              // Handle errors (display message to the user, etc.)
-            }
+          if (response.ok) {
+            const userData = await response.json(); // Get user data from the server
+            // Redirect or update the UI as needed (e.g., store userData in local storage or a cookie)
+            const resBox = document.getElementById('result');
+            resBox.innerHTML = userData; // Example: redirect to dashboard
+          } else {
+            const errorData = await response.json();
+            console.error("FedCM login failed:", errorData);
+            // Handle errors (display message to the user, etc.)
+            resBox.innerHTML = errorData; // Example: redirect to dashboard
           }
-        } catch (error) {
-          console.error("FedCM error:", error);
-          // Handle errors (display message to the user, etc.)
         }
       });
     </script>
+    </body>
+  </html>
   `);
 });
 
 
-router.post('/auth/google/fedcm/callback', express.json(), async (req, res) => {
+router.post('/google/fedcm/callback', express.json(), async (req, res) => {
   const { token } = req.body;
+
+  console.log("token received from browser: ", token);
 
   if (!token) {
     res.status(400).json({ error: 'Missing token' });
@@ -68,6 +89,8 @@ router.post('/auth/google/fedcm/callback', express.json(), async (req, res) => {
       return
     }
     const tokenInfo = await tokenInfoResponse.json();
+
+    console.log("token info received from google: ", tokenInfo);
 
     //audience check
     if (tokenInfo.aud !== process.env.GOOGLE_CLIENT_ID) {
@@ -92,6 +115,9 @@ router.post('/auth/google/fedcm/callback', express.json(), async (req, res) => {
     expiryDate.setDate(expiryDate.getDate() + Number(process.env.REFRESH_TOKEN_EXPIRY_DAYS));
     await setRefreshToken(refreshToken, { user, expiry: expiryDate });
 
+    console.log('creds generated:')
+    console.log({ message: 'Login successful', access_token: jwtToken, token_type: 'Bearer', expires_in: expiresIn/3600 + 'h', refresh_token: refreshToken });
+
     res.json({ message: 'Login successful', access_token: jwtToken, token_type: 'Bearer', expires_in: expiresIn/3600 + 'h', refresh_token: refreshToken });
 
   } catch (error) {
@@ -100,7 +126,7 @@ router.post('/auth/google/fedcm/callback', express.json(), async (req, res) => {
   }
 });
 
-router.post('/auth/refresh-token', express.json(), async (req, res) => {
+router.post('/refresh-token', express.json(), async (req, res) => {
   const { refreshToken } = req.body;
 
   if (!refreshToken) {

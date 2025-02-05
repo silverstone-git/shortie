@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { ApiError } from "../utils/apiError";
 import { asyncHandler } from "../utils/asyncHandler";
 import jwt from "jsonwebtoken";
+import 'dotenv/config';
 
 export const authMiddleware = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
   try {

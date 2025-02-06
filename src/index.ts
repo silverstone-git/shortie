@@ -20,17 +20,12 @@ app.use('/api/analytics', limiter);
 
 app.use("/api/auth/*", ExpressAuth(authOptions))
 
-// Parse incoming requests data
-app.use(e.urlencoded({ extended: true }))
-app.use(e.json())
-// Set session in res.locals
+//set session in res.locals to check if logged in
+//auth check is done in the routers separately, if to be kept private
 app.use(authSession)
 
-// auth checking middlewares are in respective routes
-app.use('/api/shorten', shortenRouter);
-app.use('/api/analytics', analyticsRouter);
 
-app.use('/', (req, res) => {
+app.get('/', (req, res) => {
   res.send(`<h2>${JSON.stringify(res.locals.session)}</h2>
     <p>${req.header('Cookie')}</p>
 `)
@@ -38,10 +33,25 @@ app.use('/', (req, res) => {
 
 
 app.get('/:alias', async (req: e.Request, res: e.Response) => {
+  const alias = req.params.alias;
+  console.log("alias is: ", alias);
+  if(!alias) {
+    console.log("alias is: ", alias);
+    // we are at the home page, show the user info here if logged in
+    res.send(`<h2>${JSON.stringify(res.locals.session)}</h2>
+      <p>${req.header('Cookie')}</p>
+    `)
+    return;
+  }
+
+  // we have an alias
   const redisDb = await getCache();
+  const db = await getDb(mongoClient);
   try {
     const alias = req.params.alias;
+    await redisDb.connect()
     const longUrl = await redisDb.get(alias);
+    await redisDb.disconnect()
 
     if (!longUrl) {
       res.status(404).json({ error: 'URL not found' });
@@ -53,7 +63,11 @@ app.get('/:alias', async (req: e.Request, res: e.Response) => {
       urlId: longUrl,
       timestamp: new Date(),
       ip: req.ip,
+
+      // TODO: implement geolocation, etc. data sniff
+      //
       userAgent: req.get('User-Agent') || '',
+
       location: {
         lat: 0,
         lng: 0
@@ -62,7 +76,10 @@ app.get('/:alias', async (req: e.Request, res: e.Response) => {
       device: 'unknown'
     };
 
-    // TODO: implement geolocation, etc. data sniff
+    console.log(analytics);
+
+    const result = await db?.collection('analytics').insertOne(analytics);
+    console.log("analytics result: ", result);
 
     res.redirect(301, longUrl);
   } catch (err) {
@@ -73,11 +90,23 @@ app.get('/:alias', async (req: e.Request, res: e.Response) => {
 
 
 
+
+// Parse incoming requests data
+app.use(e.urlencoded({ extended: true }))
+app.use(e.json())
+
+// auth checking middlewares are in respective routes
+app.use('/api/shorten', shortenRouter);
+app.use('/api/analytics', analyticsRouter);
+
+
+
+
 // Swagger documentation
 import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
 import { authOptions } from './utils/authUtils.ts';
-import { closeConnection, getCache } from './utils/serverSetup.ts';
+import { closeConnection, getCache, getDb } from './utils/serverSetup.ts';
 import mongoClient from './utils/mongodb.ts';
 // TODO
 const swaggerDocument = YAML.load('./swagger.yaml');

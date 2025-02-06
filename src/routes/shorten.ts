@@ -1,19 +1,19 @@
-import { Request, Router } from 'express';
-import IUrl from '../models/url';
+import e from 'express';
+import IUrl from '../models/url.ts';
 import { v4 as uuidv4 } from 'uuid';
 import * as Redis from 'redis';
-import { IUser } from '../models/user';
+import type { IUser } from '../models/user.ts';
 import 'dotenv/config';
-import { authenticatedUser } from '../middlewares/auth.middleware';
+import { authenticatedUser } from '../middlewares/auth.middleware.ts';
 
 
-const router = Router();
+const router = e.Router();
 router.use(authenticatedUser);
 
 const redisClient = Redis.createClient();
 
 
-router.post('/', async (req, res) => {
+router.post('/', async (req: e.Request, res: e.Response) => {
   try {
     const { longUrl, customAlias, topic } = req.body;
     const alias = customAlias || uuidv4().substring(0, 6);
@@ -37,7 +37,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.get('/:alias', async (req: Request, res) => {
+router.get('/:alias', async (req: e.Request, res: e.Response) => {
   try {
     const alias = req.params.alias;
     const longUrl = await redisClient.get(alias);

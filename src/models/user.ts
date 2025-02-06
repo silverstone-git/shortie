@@ -15,4 +15,4 @@ const iUserSchema = new Schema<IUser>({
   createdAt: { type: Date, default: Date.now },
 });
 
-export default mongoose.model<IUser>('Url', iUserSchema);
+export const mongooseModel = mongoose.model<IUser>('Url', iUserSchema);

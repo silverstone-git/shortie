@@ -1,18 +1,18 @@
-import { NextFunction, Request, Response } from "express";
+import express from "express";
 import 'dotenv/config';
 import { getSession } from "@auth/express";
-import { authOptions } from "../utils/authUtils";
+import { authOptions } from "../utils/authUtils.ts";
 
 
-export const authSession = async (req: Request, res: Response, next: NextFunction) => {
+export const authSession = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   res.locals.session = await getSession(req, authOptions)
   next();
 }
 
 export const authenticatedUser = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
 ) => {
   const session = res.locals.session ?? (await getSession(req, authOptions))
   if (!session?.user) {

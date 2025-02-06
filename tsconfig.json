@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "target": "es6",
-    "module": "commonjs",
+    "module": "nodenext",
+    "allowImportingTsExtensions": true,
     "outDir": "./dist",
     "rootDir": "./src",
     "strict": true,

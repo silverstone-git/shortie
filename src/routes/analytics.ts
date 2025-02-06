@@ -1,8 +1,8 @@
 
 import express from 'express';
-import IAnalytics from '../models/analytics';
-import IUrl  from '../models/url';
-import { authenticatedUser } from '../middlewares/auth.middleware';
+import IAnalytics from '../models/analytics.ts';
+import IUrl  from '../models/url.ts';
+import { authenticatedUser } from '../middlewares/auth.middleware.ts';
 
 const router = express.Router();
 router.use(authenticatedUser);

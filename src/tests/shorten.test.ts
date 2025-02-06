@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import request from 'supertest';
-import app from '../index';
+import app from '../index.ts';
 
 
 describe('URL Shortener API', () => {

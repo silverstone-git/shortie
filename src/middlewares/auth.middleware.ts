@@ -14,9 +14,14 @@ export const authenticatedUser = async (
   res: express.Response,
   next: express.NextFunction
 ) => {
+  //console.log("session checking..");
+  //console.log(req.headers);
+  //console.log(req.body);
   const session = res.locals.session ?? (await getSession(req, authOptions))
+  //console.log("session got..");
+  //console.log(session);
   if (!session?.user) {
-    res.redirect("/login")
+    res.redirect("/api/auth/signin")
   } else {
     next()
   }

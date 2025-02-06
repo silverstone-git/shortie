@@ -2,10 +2,12 @@
 import express from 'express';
 import IAnalytics from '../models/analytics';
 import IUrl  from '../models/url';
+import { authenticatedUser } from '../middlewares/auth.middleware';
 
 const router = express.Router();
+router.use(authenticatedUser);
 
-router.get('/api/analytics/:alias', async (req, res) => {
+router.get('/:alias', async (req, res) => {
   try {
     const alias = req.params.alias;
     const url = await IUrl.findOne({ alias });

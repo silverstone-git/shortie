@@ -1,21 +1,26 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import rateLimit from 'express-rate-limit';
 import shortenRouter from './routes/shorten';
 import analyticsRouter from './routes/analytics';
-import authRouter from './routes/auth';
+import Google from "@auth/express/providers/google"
+import { ExpressAuth, getSession } from "@auth/express"
 
 const app = express();
+//app.set("trust proxy", true)
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100 // limit : 100 requests per windowMs
 });
 
+
 app.use('/api/auth', limiter);
 app.use('/api/shorten', limiter);
 app.use('/api/analytics', limiter);
 
-app.use('/api/auth', authRouter);
+app.use("/api/auth/*", ExpressAuth({ providers: [
+  Google
+] }))
 app.use('/api/shorten', shortenRouter);
 app.use('/api/analytics', analyticsRouter);
 

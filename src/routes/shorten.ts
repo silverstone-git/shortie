@@ -4,8 +4,12 @@ import { v4 as uuidv4 } from 'uuid';
 import * as Redis from 'redis';
 import { IUser } from '../models/user';
 import 'dotenv/config';
+import { authenticatedUser } from '../middlewares/auth.middleware';
+
 
 const router = Router();
+router.use(authenticatedUser);
+
 const redisClient = Redis.createClient();
 
 

@@ -1,17 +1,16 @@
 {
   "compilerOptions": {
     "target": "es6",
-    "module": "nodenext",
-    "allowImportingTsExtensions": true,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "outDir": "./dist",
     "rootDir": "./src",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "baseUrl": "src",
+    "baseUrl": "./", // Base directory for path resolution
     "paths": {
-      "@/*": "./*"
+      "@/*": ["./src/*"] // Map '@/*' to './src/*'
     }
   }
 }
-

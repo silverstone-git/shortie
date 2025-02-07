@@ -1,10 +1,8 @@
-//import { ExpressAuthConfig } from "@auth/express";
-//import { IUser } from "../models/user";
-import { UpstashRedisAdapter } from "@auth/upstash-redis-adapter";
+//import { UpstashRedisAdapter } from "@auth/upstash-redis-adapter";
 import Google from "@auth/express/providers/google";
 //import { Redis } from "@upstash/redis";
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
-import mongoClient from "./mongodb.ts";
+import mongoClient from "@/utils/mongodb";
 
 //const redis = new Redis({
 //  url: process.env.UPSTASH_REDIS_URL,

@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import { MongoClient } from "mongodb";
 import * as Redis from 'redis';
 

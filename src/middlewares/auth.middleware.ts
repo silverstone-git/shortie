@@ -1,7 +1,7 @@
 import express from "express";
 import 'dotenv/config';
 import { getSession } from "@auth/express";
-import { authOptions } from "../utils/authUtils.ts";
+import { authOptions } from "@/utils/authUtils";
 
 
 export const authSession = async (req: express.Request, res: express.Response, next: express.NextFunction) => {

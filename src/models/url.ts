@@ -1,4 +1,4 @@
-interface IUrlType {
+export interface IUrlType {
   longUrl: string;
   shortUrl: string;
   alias: string;

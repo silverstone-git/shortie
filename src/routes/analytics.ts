@@ -1,7 +1,7 @@
 import express from 'express';
-import { authenticatedUser } from '../middlewares/auth.middleware.ts';
-import { getDb } from '../utils/serverSetup.ts';
-import mongoClient from '../utils/mongodb.ts';
+import { authenticatedUser } from '@/middlewares/auth.middleware';
+import { getDb } from '@/utils/serverSetup';
+import mongoClient from '@/utils/mongodb';
 
 const router = express.Router();
 router.use(authenticatedUser);

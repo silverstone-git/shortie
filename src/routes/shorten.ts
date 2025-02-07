@@ -1,10 +1,10 @@
 import e from 'express';
 import { v4 as uuidv4 } from 'uuid';
-import type { IUser } from '../models/user.ts';
+import type { IUser } from '@/models/user';
 import 'dotenv/config';
-import { authenticatedUser } from '../middlewares/auth.middleware.ts';
-import { getDb, getCache } from '../utils/serverSetup.ts';
-import mongoClient from '../utils/mongodb.ts';
+import { authenticatedUser } from '@/middlewares/auth.middleware';
+import { getDb, getCache } from '@/utils/serverSetup';
+import mongoClient from '@/utils/mongodb';
 
 
 const router = e.Router();

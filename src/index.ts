@@ -1,9 +1,9 @@
 import e from 'express';
 import rateLimit from 'express-rate-limit';
-import shortenRouter from './routes/shorten.ts';
-import analyticsRouter from './routes/analytics.ts';
+import shortenRouter from '@/routes/shorten';
+import analyticsRouter from '@/routes/analytics';
 import { ExpressAuth } from "@auth/express"
-import { authSession } from './middlewares/auth.middleware.ts';
+import { authSession } from '@/middlewares/auth.middleware';
 
 const app = e();
 //app.set("trust proxy", true)
@@ -105,12 +105,12 @@ app.use('/api/analytics', analyticsRouter);
 // Swagger documentation
 import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
-import { authOptions } from './utils/authUtils.ts';
-import { closeConnection, getCache, getDb } from './utils/serverSetup.ts';
-import mongoClient from './utils/mongodb.ts';
+import { authOptions } from '@/utils/authUtils';
+import { closeConnection, getCache, getDb } from '@/utils/serverSetup';
+import mongoClient from '@/utils/mongodb';
 // TODO
-const swaggerDocument = YAML.load('./swagger.yaml');
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+const swaggerDocument = YAML.load('swagger.yaml');
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.listen(3000, () => {
   console.log('Server is running on port 3000');

@@ -4,12 +4,12 @@ import { getSession } from "@auth/express";
 import authUtils from "@/utils/authUtils";
 
 
-export const authSession = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+const authSession = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   res.locals.session = await getSession(req, authUtils.authOptions)
   next();
 }
 
-export const authenticatedUser = async (
+const authenticatedUser = async (
   req: express.Request,
   res: express.Response,
   next: express.NextFunction
@@ -26,3 +26,5 @@ export const authenticatedUser = async (
     next()
   }
 }
+
+export default {authSession, authenticatedUser};

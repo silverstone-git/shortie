@@ -32,19 +32,23 @@ router.post('/', async (req: e.Request, res: e.Response) => {
       alias,
       topic,
       // to be provided by auth middleware
-      createdBy: (res.locals.session.user as IUser).email as string
-    };
+      createdBy: (res.locals.session.user as IUser).email as string,
+      createdAt: Date.now()
+    } as IUrl;
 
 
-    const result = await db?.collection('urls').insertOne(url);
-    console.log("result of url insertOne: ", result)
-    await redisDb.connect()
-    await redisDb.set(alias, longUrl);
-    await redisDb.disconnect();
-    console.log("redis setting done!")
-
-    res.json({ shortUrl, createdAt: Date.now() });
-  } catch (err) {
+    const result = await db?.collection('urls').updateOne({alias}, { $setOnInsert: {...url} }, {upsert: true});
+    console.log("result of url updateOne: ", result)
+    if (result.upsertedCount == 1) {
+      await redisDb.connect()
+      await redisDb.set(alias, longUrl);
+      await redisDb.disconnect();
+      console.log("redis setting done!")
+      res.status(201).json({ shortUrl, createdAt: Date.now() });
+      return;
+    }
+    res.status(409).json({message: "The alias is already taken.please choose anothr one"});
+  } catch (err: any) {
     res.status(500).json({ error: 'Internal server error' });
   }
 });

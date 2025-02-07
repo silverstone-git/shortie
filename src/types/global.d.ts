@@ -52,3 +52,13 @@ interface IUser {
   image: string;
   createdAt: Date | undefined;
 }
+
+interface IUrl {
+  longUrl: string;
+  shortUrl: string;
+  alias: string;
+  topic: string;
+  // the email of the creator
+  createdBy: string | undefined;
+  createdAt: number | undefined;
+}

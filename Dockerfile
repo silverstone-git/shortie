@@ -1,4 +1,4 @@
-FROM node:22.13.1-bookworm
+FROM node:current-bookworm
 WORKDIR /app
 COPY package*.json ./
 RUN npm install

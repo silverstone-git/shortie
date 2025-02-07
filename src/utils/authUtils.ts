@@ -9,9 +9,11 @@ import mongoClient from "@/utils/mongodb";
 //  token: process.env.UPSTASH_REDIS_TOKEN,
 //})
 
-export const authOptions: any = {
+const authOptions: any = {
   providers: [
     Google
   ],
   adapter: MongoDBAdapter(mongoClient)
 }
+
+export default {authOptions};

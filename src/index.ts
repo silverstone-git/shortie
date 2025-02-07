@@ -5,6 +5,8 @@ import analyticsRouter from '@/routes/analytics';
 import { ExpressAuth } from "@auth/express"
 import authMiddleware from '@/middlewares/auth.middleware';
 
+import 'dotenv/config'
+
 const app = e();
 //app.set("trust proxy", true)
 
@@ -111,8 +113,9 @@ import authUtils from '@/utils/authUtils';
 const swaggerDocument = YAML.load('swagger.yaml');
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-app.listen(3000, () => {
-  console.log('Server is running on port 3000');
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
 
 export default app;

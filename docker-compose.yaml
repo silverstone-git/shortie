@@ -1,25 +1,14 @@
-version: '3'
 services:
-  app:
+  web:
     build: .
     ports:
-      - "${PORT}:${PORT}"
+      - "7871:7871"
+    depends_on:
+      - redis
     environment:
-      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
-      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
-      - BASE_URL=${BASE_URL}
+      - NODE_ENV=${NODE_ENV:-production} # Default to 'production' if not set
+      - PORT=7871
+    env_file:
+      - .env.production
   redis:
-    image: redis:alpine
-    ports:
-      - "6379:6379"
-  mongo:
-    image: mongo:4.4
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo_data:/data/db
-
-volumes:
-  mongo_data:
-
-
+    image: "redis:latest"

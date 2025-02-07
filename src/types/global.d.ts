@@ -1,3 +1,8 @@
+declare module '@/index' {
+  const index: any;
+  export default index;
+}
+
 declare module '@/routes/shorten' {
   const shortenRouter: any;
   export default shortenRouter;
@@ -32,7 +37,18 @@ declare module '@/utils/serverSetup' {
 }
 
 declare module '@/middlewares/auth.middleware' {
-  const authMiddleware: any;
+  interface AuthMiddleware {
+    authSession: any;
+    authenticatedUser: any;
+  }
+  const authMiddleware: AuthMiddleware;
   export default authMiddleware;
 }
 
+interface IUser {
+  googleId: string | undefined;
+  name: string;
+  email: string;
+  image: string;
+  createdAt: Date | undefined;
+}

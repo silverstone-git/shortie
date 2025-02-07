@@ -1,13 +1,13 @@
 import express from 'express';
-import { authenticatedUser } from '@/middlewares/auth.middleware';
-import { getDb } from '@/utils/serverSetup';
+import authMiddleware from '@/middlewares/auth.middleware';
+import serverSetup from '@/utils/serverSetup';
 import mongoClient from '@/utils/mongodb';
 
 const router = express.Router();
-router.use(authenticatedUser);
+router.use(authMiddleware.authenticatedUser);
 
 router.get('/:alias', async (req, res) => {
-  const db = await getDb(mongoClient);
+  const db = await serverSetup.getDb(mongoClient);
   try {
     const alias = req.params.alias;
     const url = await db?.collection('urls').findOne({ alias });
@@ -21,7 +21,7 @@ router.get('/:alias', async (req, res) => {
 
     res.json({
       totalClicks: analytics?.length,
-      uniqueUsers: new Set(analytics?.map(a => a.ip)).size,
+      uniqueUsers: new Set(analytics?.map((a: any) => a.ip)).size,
       clicksByDate: analytics?.reduce((acc: any, curr: any) => {
         const date = curr.timestamp.toDateString();
         acc[date] = (acc[date] || 0) + 1;

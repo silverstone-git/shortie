@@ -11,6 +11,7 @@
     "baseUrl": "./", // Base directory for path resolution
     "paths": {
       "@/*": ["./src/*"] // Map '@/*' to './src/*'
-    }
+    },
+    "typeRoots": ["./node_modules/@types", "./src/types"]
   }
 }

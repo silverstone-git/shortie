@@ -1,21 +1,19 @@
 import e from 'express';
 import { v4 as uuidv4 } from 'uuid';
-import type { IUser } from '@/models/user';
 import 'dotenv/config';
-import { authenticatedUser } from '@/middlewares/auth.middleware';
-import { getDb, getCache } from '@/utils/serverSetup';
+import authMiddleware from '@/middlewares/auth.middleware';
+import serverSetup from '@/utils/serverSetup';
 import mongoClient from '@/utils/mongodb';
 
-
 const router = e.Router();
-router.use(authenticatedUser);
+router.use(authMiddleware.authenticatedUser);
 
 
 
 router.post('/', async (req: e.Request, res: e.Response) => {
 
-  const db = await getDb(mongoClient);
-  const redisDb = await getCache();
+  const db = await serverSetup.getDb(mongoClient);
+  const redisDb = await serverSetup.getCache();
 
   try {
     console.log(req.body);

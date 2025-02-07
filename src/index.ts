@@ -3,7 +3,7 @@ import rateLimit from 'express-rate-limit';
 import shortenRouter from '@/routes/shorten';
 import analyticsRouter from '@/routes/analytics';
 import { ExpressAuth } from "@auth/express"
-import { authSession } from '@/middlewares/auth.middleware';
+import authMiddleware from '@/middlewares/auth.middleware';
 
 const app = e();
 //app.set("trust proxy", true)
@@ -18,11 +18,11 @@ app.use('/api/auth', limiter);
 app.use('/api/shorten', limiter);
 app.use('/api/analytics', limiter);
 
-app.use("/api/auth/*", ExpressAuth(authOptions))
+app.use("/api/auth/*", ExpressAuth(authUtils.authOptions))
 
 //set session in res.locals to check if logged in
 //auth check is done in the routers separately, if to be kept private
-app.use(authSession)
+app.use(authMiddleware.authSession)
 
 
 app.get('/', (req, res) => {
@@ -45,8 +45,8 @@ app.get('/:alias', async (req: e.Request, res: e.Response) => {
   }
 
   // we have an alias
-  const redisDb = await getCache();
-  const db = await getDb(mongoClient);
+  const redisDb = await serverSetup.getCache();
+  const db = await serverSetup.getDb(mongoClient);
   try {
     const alias = req.params.alias;
     await redisDb.connect()
@@ -105,10 +105,9 @@ app.use('/api/analytics', analyticsRouter);
 // Swagger documentation
 import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
-import { authOptions } from '@/utils/authUtils';
-import { closeConnection, getCache, getDb } from '@/utils/serverSetup';
+import serverSetup from '@/utils/serverSetup';
 import mongoClient from '@/utils/mongodb';
-// TODO
+import authUtils from '@/utils/authUtils';
 const swaggerDocument = YAML.load('swagger.yaml');
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
@@ -121,7 +120,7 @@ export default app;
 process.on('SIGINT', async () => {
     console.log('Shutting down gracefully...');
     try {
-      await closeConnection(mongoClient);
+      await serverSetup.closeConnection(mongoClient);
       console.log('MongoDB connection closed.');
       process.exit(0);
     } catch (err) {

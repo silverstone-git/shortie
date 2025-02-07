@@ -1,11 +1,11 @@
 import express from "express";
 import 'dotenv/config';
 import { getSession } from "@auth/express";
-import { authOptions } from "@/utils/authUtils";
+import authUtils from "@/utils/authUtils";
 
 
 export const authSession = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
-  res.locals.session = await getSession(req, authOptions)
+  res.locals.session = await getSession(req, authUtils.authOptions)
   next();
 }
 
@@ -17,7 +17,7 @@ export const authenticatedUser = async (
   //console.log("session checking..");
   //console.log(req.headers);
   //console.log(req.body);
-  const session = res.locals.session ?? (await getSession(req, authOptions))
+  const session = res.locals.session ?? (await getSession(req, authUtils.authOptions))
   //console.log("session got..");
   //console.log(session);
   if (!session?.user) {

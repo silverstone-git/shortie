@@ -4,6 +4,7 @@ import shortenRouter from '@/routes/shorten';
 import analyticsRouter from '@/routes/analytics';
 import { ExpressAuth } from "@auth/express"
 import authMiddleware from '@/middlewares/auth.middleware';
+import geoip from "geoip-lite";
 
 import 'dotenv/config'
 
@@ -55,7 +56,6 @@ app.get('/:alias', async (req: e.Request, res: e.Response) => {
     await redisDb.connect()
     var longUrl = await redisDb.get(alias);
     console.log("redis returned:", longUrl);
-    await redisDb.disconnect()
 
     if (!longUrl) {
       // cache miss :(
@@ -69,24 +69,39 @@ app.get('/:alias', async (req: e.Request, res: e.Response) => {
         return
       }
       longUrl = url.longUrl;
+
+      redisDb.set(alias, longUrl).then(() => {
+        redisDb.disconnect();
+      });
     }
+
+    const userAgent = req.header('user-agent') || '';
+    let os = 'Unknown';
+    if (userAgent.includes('Windows')) {
+      os = 'Windows';
+    } else if (userAgent.includes('Macintosh')) {
+      os = 'macOS';
+    } else if (userAgent.includes('Linux')) {
+      os = 'Linux';
+    }
+
+    const ip = req.ip || req.header('x-forwarded-for');
+    var geo = geoip.lookup(ip);
+
 
     // log analytics
     const analytics = {
-      urlId: longUrl,
+      alias: alias,
       timestamp: new Date(),
-      ip: req.ip,
+      ip: ip,
 
-      // TODO: implement geolocation, etc. data sniff
-      //
-      userAgent: req.get('User-Agent') || '',
+      userAgent: userAgent,
 
       location: {
-        lat: 0,
-        lng: 0
+        lat: geo.ll[0],
+        lng: geo.ll[1]
       },
-      os: 'unknown',
-      device: 'unknown'
+      os: os,
     };
 
     console.log(analytics);

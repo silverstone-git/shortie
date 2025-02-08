@@ -36,10 +36,13 @@ router.post('/', async (req: e.Request, res: e.Response) => {
     const result = await db?.collection('urls').updateOne({alias}, { $setOnInsert: {...url} }, {upsert: true});
     console.log("result of url updateOne: ", result)
     if (result.upsertedCount == 1) {
-      await redisDb.connect()
-      await redisDb.set(alias, longUrl);
-      await redisDb.disconnect();
-      console.log("redis setting done!")
+      redisDb.connect().then(() => {
+        redisDb.set(alias, longUrl).then(() => {
+          redisDb.disconnect().then(() => {
+            console.log("redis set!")
+          })
+        })
+      })
       res.status(201).json({ shortUrl: `${process.env.BASE_URL}/${alias}`, createdAt: Date.now() });
       return;
     }

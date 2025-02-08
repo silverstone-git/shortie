@@ -4,6 +4,82 @@ info:
   description: API for creating and managing short URLs
   version: 1.0.0
 paths:
+  /api/auth/signin:
+    get:
+      summary: Get all the login methods
+      description: OAuth login portal to return cookies in the home page, for further authorization
+      response:
+        '200':
+          description: Successfully served the OAuth login page
+
+  /:
+    get:
+      summary: Get the user info and site cookies
+      description: Fetch the user info and site cookies for further authorization; null and undefined otherwise
+      response:
+        '200':
+          description: Successfully served the Home Page
+          schema:
+            type: string
+
+  /{alias}:
+    get:
+      summary: Gets the url corresponding to the given alias
+      description: Fetches the url corresponding to the given alias, if exists
+      responses:
+        '309'
+
+  /api/analytics/{alias}:
+    get:
+      summary: Get the overall analytics
+      description: Fetch the metrics relevant to the alias
+      parameters:
+        - in: path 
+          name: alias
+          scheme: string
+      responses:
+        '400':
+          summary: No alias provided in path
+          schema:
+            type: object
+          properties:
+            error:
+              type: string
+        '404':
+          summary: No url found for the given alias
+          schema:
+            type: object
+          properties:
+            error:
+              type: string
+        '500':
+          summary: Internal Server Error
+          schema:
+            type: object
+          properties:
+            error:
+              type: string
+        '200':
+          summary: Analytics given back
+          schema:
+            type: object
+          properties:
+            totalClicks:
+              summary: Gives the total clicks
+              type: number
+            uniqueUsers:
+              summary: Gives the no. of unique users who clicked
+              type: number
+            clicksByDate:
+              summary: Gives the amount of clicks for each date
+              type: object
+            clicksByOS:
+              summary: Gives the amount of clicks for each OS
+              type: string
+            clicksByLocation:
+              summary: Gives the amount of clicks for each neighbour block
+              type: object
+
   /api/shorten:
     post:
       summary: Create a new short URL
@@ -33,5 +109,19 @@ paths:
               createdAt:
                 type: string
                 format: date-time
+        '409':
+          description: The alias already exists
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+        '500':
+          description: Internal Server Error
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
 
 

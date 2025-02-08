@@ -81,6 +81,8 @@ app.get('/:alias', async (req: e.Request, res: e.Response) => {
       os = 'Windows';
     } else if (userAgent.includes('Macintosh')) {
       os = 'macOS';
+    } else if (userAgent.includes('Android')) {
+      os = 'Android';
     } else if (userAgent.includes('Linux')) {
       os = 'Linux';
     }

@@ -46,7 +46,7 @@ router.post('/', async (req: e.Request, res: e.Response) => {
       res.status(201).json({ shortUrl: `${process.env.BASE_URL}/${alias}`, createdAt: Date.now() });
       return;
     }
-    res.status(409).json({message: "The alias is already taken.please choose anothr one"});
+    res.status(409).json({error: "The alias is already taken.please choose anothr one"});
   } catch (err: any) {
     res.status(500).json({ error: 'Internal server error' });
   }

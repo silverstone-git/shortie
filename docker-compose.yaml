@@ -11,5 +11,14 @@ services:
       - PORT=7871
     env_file:
       - .env
+    networks:
+      - rednet
   redis:
     image: "redis:latest"
+    networks:
+      - rednet
+
+
+networks:
+  rednet:
+      driver: bridge

@@ -38,7 +38,7 @@ app.get('/:alias', async (req: e.Request, res: e.Response) => {
   const alias = req.params.alias;
   console.log("alias is: ", alias);
   if(!alias) {
-    console.log("alias is: ", alias);
+    console.log("no alias, returning home");
     // we are at the home page, show the user info here if logged in
     res.send(`<h2>${JSON.stringify(res.locals.session)}</h2>
       <p>${req.header('Cookie')}</p>
@@ -48,17 +48,21 @@ app.get('/:alias', async (req: e.Request, res: e.Response) => {
 
   // we have an alias
   const redisDb = await serverSetup.getCache();
+  console.log("redis db is: ", redisDb);
   const db = await serverSetup.getDb(mongoClient);
   try {
     const alias = req.params.alias;
     await redisDb.connect()
     var longUrl = await redisDb.get(alias);
+    console.log("redis returned:", longUrl);
     await redisDb.disconnect()
 
     if (!longUrl) {
       // cache miss :(
       // try mongo
+      console.log("cache miss");
       const url = await db.collection('urls').findOne({alias});
+      console.log("url is:", url);
       if(!url) {
         // nowhere to be found
         res.status(404).json({ error: 'URL not found' });
@@ -92,7 +96,7 @@ app.get('/:alias', async (req: e.Request, res: e.Response) => {
 
     res.redirect(301, longUrl);
   } catch (err) {
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: `Internal server error: ${err}` });
   }
 
 });

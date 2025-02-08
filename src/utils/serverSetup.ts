@@ -1,5 +1,6 @@
 import { MongoClient } from "mongodb";
 import * as Redis from 'redis';
+import 'dotenv/config'
 
 async function getDb(mongoClient: MongoClient) {
   try {
@@ -25,7 +26,9 @@ async function closeConnection(mongoClient: MongoClient) {
 };
 
 async function getCache() {
-  return Redis.createClient();
+  return Redis.createClient({
+    url: process.env?.REDIS_URL ?? "http://localhost:6379"
+  });
 }
 
 export default {getDb, getCache, closeConnection};

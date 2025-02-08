@@ -142,20 +142,20 @@ Contributions are welcome! Please open an issue or submit a pull request.
 ## License
 [MIT](https://mit-license.org)
 
-### Key Improvements and Explanations
+## Key Improvements and Explanations
 
 This project has undergone several key improvements, focusing on code organization, functionality, and production readiness. Here's a detailed breakdown:
-Code Structure and Organization:
+### Code Structure and Organization:
  * Modular Design: The codebase is organized into distinct folders (routes, types, utils, middlewares) to promote maintainability and scalability. This separation of concerns makes it easier to navigate and understand the different parts of the application.
  * Unified Exports: Exports from files are unified for production builds, streamlining the build process and potentially reducing bundle size.
-Functionality Enhancements:
+### Functionality Enhancements:
  * Enhanced Analytics: The analytics response object has been improved to provide more comprehensive data, including total clicks, unique users, clicks by date, operating system (including Android), and geographic location.
  * Geolocation: Geolocation functionality has been implemented, allowing for the tracking of clicks based on user location.  This feature uses geoip-lite to provide geolocation data.
  * Location Grouping:  A location grouping feature has been added, using ngeohash to group clicks from nearby areas (e.g., within a country or region) for more meaningful location-based analytics.
  * Improved URL Handling: Redundant fields in the URL data have been removed, simplifying the data model.
  * Authentication with Auth.js: The authentication system has been migrated to Auth.js, providing a more robust, secure, and feature-rich authentication solution.  This replaces the previous manual OAuth implementation.
  * User Model Adjustments: The user model has been updated to align with the Google user payload, simplifying user data handling.
-Production Readiness:
+### Production Readiness:
  * Import Alias Fix: tsc-alias is used to resolve import aliases in production builds, ensuring that the application works correctly after compilation.
  * Docker Setup: Docker setup has been improved and made compatible with environment variables, allowing for easier deployment and configuration in different environments.
  * Redis Service in Docker Compose: A Redis service has been added to the docker-compose.yml file, simplifying the management of Redis as a dependency in the Docker environment.
@@ -164,11 +164,11 @@ Production Readiness:
  * Redis Connection Fix: Issues with the Redis connection have been resolved, ensuring reliable communication with the Redis database.
  * Enhanced Logging: More logging has been added to improve debugging and monitoring in production.
  * Package Lock Ignored: The package-lock.json file is now ignored in version control to allow flexibility in dependency updates. (This is generally not recommended unless you have a specific reason to do so).
-Bug Fixes and Debugging:
+### Bug Fixes and Debugging:
  * Docker Configuration: Issues with the Docker environment were resolved with a lot of trial and error
  * Type Error Fixes: Several type errors have been corrected to improve code stability and prevent runtime issues.
  * /:alias Endpoint Fix: The /:alias endpoint has been debugged and corrected, and it has been multiplexed with the root route (/) to avoid conflicts.
-Other Deliberate Choices / Challenges:
+### Other Deliberate Choices / Challenges:
  * Mongoose Removed: Mongoose has been removed, potentially simplifying the database interaction and improving performance.  MongoDB's native driver is now used.
  * type: 'module' setting in package.json: The entire API has been made an EcmaScript Module to be compatible with modern JS runtimes and libraries, backwards compatible with CommonJS
  * Global Type File Updates: The global type file has been updated with more modules to improve type safety across the project

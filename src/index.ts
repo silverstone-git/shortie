@@ -8,7 +8,7 @@ import authMiddleware from '@/middlewares/auth.middleware';
 import 'dotenv/config'
 
 const app = e();
-app.set("trust proxy", true)
+app.set("trust proxy", 1)
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes

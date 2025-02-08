@@ -55,7 +55,6 @@ interface IUser {
 
 interface IUrl {
   longUrl: string;
-  shortUrl: string;
   alias: string;
   topic: string;
   // the email of the creator

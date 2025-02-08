@@ -22,13 +22,9 @@ router.post('/', async (req: e.Request, res: e.Response) => {
     console.log(customAlias);
     console.log(topic);
     const alias = customAlias || uuidv4().substring(0, 6);
-    const shortUrl = `${process.env.BASE_URL}/${alias}`;
-
-    console.log("result of short url: ", shortUrl)
 
     const url = {
       longUrl,
-      shortUrl,
       alias,
       topic,
       // to be provided by auth middleware
@@ -44,7 +40,7 @@ router.post('/', async (req: e.Request, res: e.Response) => {
       await redisDb.set(alias, longUrl);
       await redisDb.disconnect();
       console.log("redis setting done!")
-      res.status(201).json({ shortUrl, createdAt: Date.now() });
+      res.status(201).json({ shortUrl: `${process.env.BASE_URL}/${alias}`, createdAt: Date.now() });
       return;
     }
     res.status(409).json({message: "The alias is already taken.please choose anothr one"});

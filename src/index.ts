@@ -8,7 +8,7 @@ import authMiddleware from '@/middlewares/auth.middleware';
 import 'dotenv/config'
 
 const app = e();
-//app.set("trust proxy", true)
+app.set("trust proxy", true)
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -52,12 +52,19 @@ app.get('/:alias', async (req: e.Request, res: e.Response) => {
   try {
     const alias = req.params.alias;
     await redisDb.connect()
-    const longUrl = await redisDb.get(alias);
+    var longUrl = await redisDb.get(alias);
     await redisDb.disconnect()
 
     if (!longUrl) {
-      res.status(404).json({ error: 'URL not found' });
-      return;
+      // cache miss :(
+      // try mongo
+      const url = await db.collection('urls').findOne({alias});
+      if(!url) {
+        // nowhere to be found
+        res.status(404).json({ error: 'URL not found' });
+        return
+      }
+      longUrl = url.longUrl;
     }
 
     // log analytics

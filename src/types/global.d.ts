@@ -61,3 +61,16 @@ interface IUrl {
   createdBy: string | undefined;
   createdAt: number | undefined;
 }
+
+interface IAnalytic {
+
+  timestamp: Date;
+  userAgent: string;
+  location: {lat: number; lng: number;};
+  alias: string;
+  os: string;
+  ip: string;
+  urlBy: string;
+  topic: string;
+
+}

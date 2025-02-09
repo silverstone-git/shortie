@@ -21,6 +21,12 @@ router.post('/', async (req: e.Request, res: e.Response) => {
     console.log(longUrl);
     console.log(customAlias);
     console.log(topic);
+
+    if(topic.includes(';')) {
+      res.status(400).json({error: 'Please enter a better topic name'})
+      return;
+    }
+
     const alias = customAlias || uuidv4().substring(0, 6);
 
     const url = {
@@ -51,5 +57,11 @@ router.post('/', async (req: e.Request, res: e.Response) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+router.get('/:alias', async (req: e.Request, res: e.Response) => {
+  // GET /api/shorten/{alias}
+  // Redirect to the original URL based on the short URL alias, enabling seamless access to the long URL
+  res.redirect(307, `/${req.params.alias}`)
+})
 
 export default router;

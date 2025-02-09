@@ -54,7 +54,9 @@ app.get('/:alias', async (req: e.Request, res: e.Response) => {
   try {
     const alias = req.params.alias;
     await redisDb.connect()
-    var longUrl = await redisDb.get(alias);
+
+    // alias response contains longUrl, urlBy, topic
+    var [ longUrl, urlBy, topic] = (await redisDb.get(alias)).split(';');
     console.log("redis returned:", longUrl);
 
     if (!longUrl) {
@@ -62,6 +64,9 @@ app.get('/:alias', async (req: e.Request, res: e.Response) => {
       // try mongo
       console.log("cache miss");
       const url = await db.collection('urls').findOne({alias});
+      urlBy = url.createdBy;
+      topic = url.topic;
+
       console.log("url is:", url);
       if(!url) {
         // nowhere to be found
@@ -70,21 +75,26 @@ app.get('/:alias', async (req: e.Request, res: e.Response) => {
       }
       longUrl = url.longUrl;
 
-      redisDb.set(alias, longUrl).then(() => {
+      redisDb.set(alias, `${longUrl};${urlBy};${topic}`).then(() => {
         redisDb.disconnect();
       });
     }
 
-    const userAgent = req.header('user-agent') || '';
+    const userAgentOg = req.header('user-agent').toLowerCase() || '';
+    const userAgent = userAgentOg.toLowerCase();
     let os = 'Unknown';
-    if (userAgent.includes('Windows')) {
+    if (userAgent.includes('windows')) {
       os = 'Windows';
-    } else if (userAgent.includes('Macintosh')) {
+    } else if (userAgent.includes('iphone') || userAgent.includes('iphone os')) {
+      os = 'iPhone';
+    } else if (userAgent.includes('macintosh') || userAgent.includes('mac os')) {
       os = 'macOS';
-    } else if (userAgent.includes('Android')) {
+    } else if (userAgent.includes('android')) {
       os = 'Android';
-    } else if (userAgent.includes('Linux')) {
+    } else if (userAgent.includes('linux')) {
       os = 'Linux';
+    } else if (userAgent.includes('curl')) {
+      os = 'Terminal';
     }
 
     const ip = req.ip || req.header('x-forwarded-for');
@@ -92,23 +102,25 @@ app.get('/:alias', async (req: e.Request, res: e.Response) => {
 
 
     // log analytics
-    const analytics = {
-      alias: alias,
+    const analytic: IAnalytic = {
       timestamp: new Date(),
-      ip: ip,
-
-      userAgent: userAgent,
+      userAgent: userAgentOg,
 
       location: {
         lat: geo.ll[0],
         lng: geo.ll[1]
       },
-      os: os,
+
+      alias,
+      os,
+      ip,
+      urlBy,
+      topic
     };
 
-    console.log(analytics);
+    console.log(analytic);
 
-    const result = await db?.collection('analytics').insertOne(analytics);
+    const result = await db?.collection('analytics').insertOne(analytic);
     console.log("analytics result: ", result);
 
     res.redirect(301, longUrl);

@@ -26,7 +26,68 @@ router.get('/:alias', async (req, res) => {
       return 
     }
 
-    const analytics = await db?.collection('analytics').find({ alias }).toArray();
+    if(url.createdBy.trim() == res.locals.session.user.email.trim()) {
+      // the analytics are made by this user only
+
+
+      const analytics = await db?.collection('analytics').find({ alias }).toArray();
+
+      res.status(200).json({
+        totalClicks: analytics?.length,
+        uniqueUsers: new Set(analytics?.map((a: any) => a.ip)).size,
+        clicksByDate: analytics?.reduce((acc: any, curr: any) => {
+          const date = curr.timestamp.toDateString();
+          acc[date] = (acc[date] || 0) + 1;
+          return acc;
+        }, {}),
+        clicksByOS: analytics?.reduce((acc: any, curr: any) => {
+          const os = curr.os;
+          acc[os] = (acc[os] || 0) + 1;
+          return acc;
+        }, {}),
+        clicksByLocation: analytics?.reduce((acc: any, { location }) => {
+          // Encode the coordinates into a geohash
+          const hash = ngeohash.encode(location.lat, location.lng, LOCATION_GROUPING_PRECISION);
+          acc[hash] = (acc[hash] || 0) + 1;
+          return acc;
+        }, {})
+      });
+    } else {
+      // 403
+      console.log("bugger off");
+      res.status(403).json({'error': 'Please give an alias that you made using this API'})
+    }
+
+  } catch (err) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+router.get('/topic/:topic', async (req, res) => {
+  // get all urls with the given topic, and for the ones having createBy == res.locals.sesion.user.email, show analytics
+  //
+  const db = await serverSetup.getDb(mongoClient);
+  try {
+    const topic = req.params.topic.trim();
+    if(!topic) {
+      res.status(400).json({ error: 'Empty topic, please provide a link topic that you saved in path' });
+      return 
+    }
+    console.log("topic is: ", topic);
+
+    let analytics = await db?.collection('analytics').find({ topic }).toArray();
+    console.log("analytics got: ", analytics);
+
+    if (!analytics || analytics.length == 0) {
+      res.status(404).json({ error: 'Analytics not found' });
+      return 
+    }
+
+
+
+    analytics = analytics.filter((analytic: any) => analytic.urlBy == res.locals.session.user.email)
+
+    console.log("analytics filtered: ", analytics);
 
     res.status(200).json({
       totalClicks: analytics?.length,
@@ -37,7 +98,7 @@ router.get('/:alias', async (req, res) => {
         return acc;
       }, {}),
       clicksByOS: analytics?.reduce((acc: any, curr: any) => {
-        const os = curr.os || 'unknown';
+        const os = curr.os;
         acc[os] = (acc[os] || 0) + 1;
         return acc;
       }, {}),
@@ -48,10 +109,11 @@ router.get('/:alias', async (req, res) => {
         return acc;
       }, {})
     });
-  } catch (err) {
-    res.status(500).json({ error: 'Internal server error' });
+
+  } catch (e: any) {
+    console.log(e);
   }
-});
+})
 
 // TODO: more analystics stuff
 

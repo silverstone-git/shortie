@@ -78,12 +78,12 @@ DOCKER_USERNAME=ABCABCABCABACC  # only required to label docker image and push t
    * For production, use a .env.production file and configure it as needed.  Remember to copy it to the Docker container.
 
 ### Running the API
-Local Development:
+### Local Development:
 
 ```
 npm run dev  # Uses nodemon for automatic restarts
 ```
-Production (Docker):
+### Production (Docker):
  * Build the Docker image:
  ```
    docker-compose build
@@ -92,6 +92,12 @@ Production (Docker):
  ```
    docker-compose up -d
 ```
+
+### Next steps
+- Log in by visiting /api/auth/signin
+- Copy the cookie string shown at home page into your request's Cookie Header
+- Shorten URLs and Analyze the visitors
+- Profit
 
 ## API Endpoints
 The API is documented using Swagger.  You can access the Swagger UI at /api-docs after starting the server.  The following are the main endpoints:

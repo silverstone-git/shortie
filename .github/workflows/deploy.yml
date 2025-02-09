@@ -44,22 +44,22 @@ jobs:
           username: ${{ secrets.DO_USERNAME }}
           key: ${{ secrets.DO_PRIVATE_KEY }}
           script: |
-            export AUTH_GOOGLE_ID="${{ secrets.AUTH_GOOGLE_ID }}"
-            export AUTH_GOOGLE_SECRET="${{ secrets.AUTH_GOOGLE_SECRET }}"
-            export AUTH_SECRET="${{ secrets.AUTH_SECRET }}"
-            export AUTH_TRUST_HOST="${{ secrets.AUTH_TRUST_HOST }}"
-            export BASE_URL="${{ secrets.BASE_URL }}"
-            export DOCKER_USERNAME="${{ secrets.DOCKER_USERNAME }}"
-            export MAXMIND_LICENSE_KEY="${{ secrets.MAXMIND_LICENSE_KEY }}"
-            export MONGODB_URI="${{ secrets.MONGODB_URI }}"
-            export PORT="${{ secrets.PORT }}"
-            export REDIS_URL="${{ secrets.REDIS_URL }}"
-            export NODE_ENV="production"
             mkdir -p ./projects/shortie
             cd ./projects/shortie
             touch .env.production
             source ~/.bashrc
-            echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+            export MAXMIND_LICENSE_KEY=${{ secrets.MAXMIND_LICENSE_KEY }}
+            echo "AUTH_GOOGLE_ID=${{ secrets.AUTH_GOOGLE_ID }}" >> .env.production
+            echo "AUTH_GOOGLE_SECRET=${{ secrets.AUTH_GOOGLE_SECRET }}" >> .env.production
+            echo "AUTH_SECRET=${{ secrets.AUTH_SECRET }}" >> .env.production
+            echo "AUTH_TRUST_HOST=${{ secrets.AUTH_TRUST_HOST }}" >> .env.production
+            echo "BASE_URL=${{ secrets.BASE_URL }}" >> .env.production
+            echo "DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}" >> .env.production
+            echo "MONGODB_URI=${{ secrets.MONGODB_URI }}" >> .env.production
+            echo "PORT=${{ secrets.PORT }}" >> .env.production
+            echo "REDIS_URL=${{ secrets.REDIS_URL }}" >> .env.production
+            echo "NODE_ENV="production"" >> .env.production
+            echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
             curl -L -o ./docker-compose.yaml https://raw.githubusercontent.com/silverstone-git/shortie/main/docker-compose.yaml
             docker-compose pull
             docker-compose down

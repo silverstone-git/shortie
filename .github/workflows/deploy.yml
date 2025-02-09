@@ -50,6 +50,7 @@ jobs:
             source ~/.bashrc
             export MAXMIND_LICENSE_KEY=${{ secrets.MAXMIND_LICENSE_KEY }}
             export DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
+            export LATEST_TAG=${{ github.sha }}
             echo "AUTH_GOOGLE_ID=${{ secrets.AUTH_GOOGLE_ID }}" >> .env.production
             echo "AUTH_GOOGLE_SECRET=${{ secrets.AUTH_GOOGLE_SECRET }}" >> .env.production
             echo "AUTH_SECRET=${{ secrets.AUTH_SECRET }}" >> .env.production

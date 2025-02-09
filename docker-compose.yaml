@@ -1,6 +1,6 @@
 services:
   web:
-    image: ${DOCKER_USERNAME}/shortie:latest
+    image: ${DOCKER_USERNAME}/shortie:${LATEST_TAG}
     build:
       context: .
       dockerfile: Dockerfile

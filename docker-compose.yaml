@@ -11,7 +11,7 @@ services:
     depends_on:
       - redis
     environment:
-      - NODE_ENV=${NODE_ENV:-production} # Default to 'production' if not set
+      - NODE_ENV=${NODE_ENV:-production}
       - PORT=7871
     env_file:
       - .env.production

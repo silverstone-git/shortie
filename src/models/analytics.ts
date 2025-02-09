@@ -9,5 +9,7 @@ export interface IAnalytics {
   };
   os: string;
   device: string;
+  topic: string;
+  urlBy: string;
 }
 

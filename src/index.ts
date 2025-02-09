@@ -48,37 +48,48 @@ app.get('/:alias', async (req: e.Request, res: e.Response) => {
   }
 
   // we have an alias
-  const redisDb = await serverSetup.getCache();
-  console.log("redis db is: ", redisDb);
+  console.log("getting cache")
+  const redisDb: RedisClientType = await serverSetup.getCache();
   const db = await serverSetup.getDb(mongoClient);
   try {
     const alias = req.params.alias;
     await redisDb.connect()
 
     // alias response contains longUrl, urlBy, topic
-    var [ longUrl, urlBy, topic] = (await redisDb.get(alias)).split(';');
-    console.log("redis returned:", longUrl);
+    let longUrl: string, urlBy: string, topic: string;
 
-    if (!longUrl) {
+    const redisGot = await redisDb.get(alias);
+
+    if (!redisGot) {
       // cache miss :(
       // try mongo
       console.log("cache miss");
-      const url = await db.collection('urls').findOne({alias});
-      urlBy = url.createdBy;
-      topic = url.topic;
 
-      console.log("url is:", url);
+      console.log("redis returned:", longUrl);
+
+      const url: IUrl = await db.collection('urls').findOne({alias});
       if(!url) {
         // nowhere to be found
         res.status(404).json({ error: 'URL not found' });
         return
       }
+
+      console.log("url got: ", url);
+      urlBy = url.createdBy;
+      topic = url.topic;
       longUrl = url.longUrl;
 
       redisDb.set(alias, `${longUrl};${urlBy};${topic}`).then(() => {
         redisDb.disconnect();
       });
+    } else {
+      // cache hit!
+      console.log("cache hit");
+      [ longUrl, urlBy, topic] = redisGot.split(';');
+
+
     }
+
 
     const userAgentOg = req.header('user-agent').toLowerCase() || '';
     const userAgent = userAgentOg.toLowerCase();
@@ -103,12 +114,13 @@ app.get('/:alias', async (req: e.Request, res: e.Response) => {
 
     // log analytics
     const analytic: IAnalytic = {
+      _id: undefined,
       timestamp: new Date(),
       userAgent: userAgentOg,
 
       location: {
-        lat: geo.ll[0],
-        lng: geo.ll[1]
+        lat: geo?.ll[0] ?? 0,
+        lng: geo?.ll[1] ?? 0
       },
 
       alias,
@@ -150,6 +162,7 @@ import YAML from 'yamljs';
 import serverSetup from '@/utils/serverSetup';
 import mongoClient from '@/utils/mongodb';
 import authUtils from '@/utils/authUtils';
+import { RedisClientType } from 'redis';
 const swaggerDocument = YAML.load('swagger.yaml');
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
@@ -164,6 +177,7 @@ process.on('SIGINT', async () => {
     console.log('Shutting down gracefully...');
     try {
       await serverSetup.closeConnection(mongoClient);
+      
       console.log('MongoDB connection closed.');
       process.exit(0);
     } catch (err) {

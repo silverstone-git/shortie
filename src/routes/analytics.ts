@@ -2,10 +2,9 @@ import express from 'express';
 import authMiddleware from '@/middlewares/auth.middleware';
 import serverSetup from '@/utils/serverSetup';
 import mongoClient from '@/utils/mongodb';
-import ngeohash from 'ngeohash';
+import analyticUtils from '@/utils/analyticUtils.js';
 
 // lower precision -> bigger area -> more handwavy grouping
-const LOCATION_GROUPING_PRECISION = 4;
 
 const router = express.Router();
 router.use(authMiddleware.authenticatedUser);
@@ -19,8 +18,14 @@ router.get('/:alias', async (req, res) => {
       return 
     }
 
+    if(alias == "overall") {
+      await overallHandler(req, res, db);
+      return
+    }
+
     const url = await db?.collection('urls').findOne({ alias });
 
+    console.log("analyzing your alias...");
     if (!url) {
       res.status(404).json({ error: 'URL not found' });
       return 
@@ -32,26 +37,8 @@ router.get('/:alias', async (req, res) => {
 
       const analytics = await db?.collection('analytics').find({ alias }).toArray();
 
-      res.status(200).json({
-        totalClicks: analytics?.length,
-        uniqueUsers: new Set(analytics?.map((a: any) => a.ip)).size,
-        clicksByDate: analytics?.reduce((acc: any, curr: any) => {
-          const date = curr.timestamp.toDateString();
-          acc[date] = (acc[date] || 0) + 1;
-          return acc;
-        }, {}),
-        clicksByOS: analytics?.reduce((acc: any, curr: any) => {
-          const os = curr.os;
-          acc[os] = (acc[os] || 0) + 1;
-          return acc;
-        }, {}),
-        clicksByLocation: analytics?.reduce((acc: any, { location }) => {
-          // Encode the coordinates into a geohash
-          const hash = ngeohash.encode(location.lat, location.lng, LOCATION_GROUPING_PRECISION);
-          acc[hash] = (acc[hash] || 0) + 1;
-          return acc;
-        }, {})
-      });
+      const analysis = await analyticUtils.analyze(analytics);
+      res.status(200).json(analysis);
     } else {
       // 403
       console.log("bugger off");
@@ -59,9 +46,38 @@ router.get('/:alias', async (req, res) => {
     }
 
   } catch (err) {
+    console.log(err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+
+
+const overallHandler = async (req: express.Request, res: express.Response, db: any) => {
+  // give analytics of the user
+  console.log("overallllll");
+  try {
+
+    let analytics: IAnalytic[] = await db?.collection('analytics').find({ urlBy: res.locals.session.user.email }).toArray();
+
+    if (!analytics || analytics.length == 0) {
+      res.status(404).json({ error: 'Analytics not found' });
+      return 
+    }
+
+    const analysis = await analyticUtils.analyze(analytics);
+    res.status(200).json({
+      totalUrls: new Set(analytics?.map((a: IAnalytic) => a.alias)).size,
+      ...analysis
+    })
+
+  } catch(e: any) {
+    console.log(e);
+    res.status(500).json({error: "Internal Server Error"});
+  }
+
+};
+
 
 router.get('/topic/:topic', async (req, res) => {
   // get all urls with the given topic, and for the ones having createBy == res.locals.sesion.user.email, show analytics
@@ -75,8 +91,7 @@ router.get('/topic/:topic', async (req, res) => {
     }
     console.log("topic is: ", topic);
 
-    let analytics = await db?.collection('analytics').find({ topic }).toArray();
-    console.log("analytics got: ", analytics);
+    let analytics = await db?.collection('analytics').find({ urlBy: res.locals.session.user.email }).toArray();
 
     if (!analytics || analytics.length == 0) {
       res.status(404).json({ error: 'Analytics not found' });
@@ -85,36 +100,20 @@ router.get('/topic/:topic', async (req, res) => {
 
 
 
-    analytics = analytics.filter((analytic: any) => analytic.urlBy == res.locals.session.user.email)
+    analytics = analytics.filter((analytic: any) => analytic.topic == topic)
 
-    console.log("analytics filtered: ", analytics);
+    if (!analytics || analytics.length == 0) {
+      res.status(404).json({ error: 'Analytics for this topic not found' });
+      return 
+    }
 
-    res.status(200).json({
-      totalClicks: analytics?.length,
-      uniqueUsers: new Set(analytics?.map((a: any) => a.ip)).size,
-      clicksByDate: analytics?.reduce((acc: any, curr: any) => {
-        const date = curr.timestamp.toDateString();
-        acc[date] = (acc[date] || 0) + 1;
-        return acc;
-      }, {}),
-      clicksByOS: analytics?.reduce((acc: any, curr: any) => {
-        const os = curr.os;
-        acc[os] = (acc[os] || 0) + 1;
-        return acc;
-      }, {}),
-      clicksByLocation: analytics?.reduce((acc: any, { location }) => {
-        // Encode the coordinates into a geohash
-        const hash = ngeohash.encode(location.lat, location.lng, LOCATION_GROUPING_PRECISION);
-        acc[hash] = (acc[hash] || 0) + 1;
-        return acc;
-      }, {})
-    });
+    const analysis = await analyticUtils.analyze(analytics);
+    res.status(200).json(analysis);
 
   } catch (e: any) {
     console.log(e);
+    res.status(500).json({error: "Internal Server Error"});
   }
 })
-
-// TODO: more analystics stuff
 
 export default router;

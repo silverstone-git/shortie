@@ -21,8 +21,10 @@ const authenticatedUser = async (
   //console.log("session got..");
   //console.log(session);
   if (!session?.user) {
+    console.log("User not logged in");
     res.redirect("/api/auth/signin")
   } else {
+    console.log("going ahead");
     next()
   }
 }

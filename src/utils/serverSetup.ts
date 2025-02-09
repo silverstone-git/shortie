@@ -25,7 +25,7 @@ async function closeConnection(mongoClient: MongoClient) {
   }
 };
 
-async function getCache() {
+const getCache: () => Promise<Redis.RedisClientType> = async () => {
   return Redis.createClient({
     url: process.env?.REDIS_URL ?? "http://localhost:6379"
   });

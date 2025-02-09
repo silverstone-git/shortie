@@ -45,6 +45,15 @@ declare module '@/middlewares/auth.middleware' {
   export default authMiddleware;
 }
 
+declare module '@/utils/analyticUtils.ts' {
+  interface AuthMiddleware {
+    LOCATION_GROUPING_PRECISION: number;
+    analyze: (analytics: IAnalytic[]) => any;
+  }
+  const authMiddleware: AuthMiddleware;
+  export default authMiddleware;
+}
+
 interface IUser {
   googleId: string | undefined;
   name: string;
@@ -63,7 +72,7 @@ interface IUrl {
 }
 
 interface IAnalytic {
-
+  _id: any;
   timestamp: Date;
   userAgent: string;
   location: {lat: number; lng: number;};

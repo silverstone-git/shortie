@@ -48,21 +48,23 @@ Shortie simplifies long URLs into shorter, more manageable links.  It also provi
 1. Clone the repository:
 
 ```bash
-   git clone https://github.com/silverstone-git/shortie.git
-   cd shortie
+git clone https://github.com/silverstone-git/shortie.git
+cd shortie
 ```
 
 
 
  * Install dependencies:
-```
-   npm install  # Or yarn install
+```bash
+npm install  # Or yarn install
 ```
 
  * Configure environment variables:
    * Create a .env file in the project root for local development (__important__) and/or put them in your shell config.  
      Example:  
-     NODE_ENV=development  
+
+```bash
+NODE_ENV=development  
 PORT=3000  
 DATABASE_URL=mongodb://localhost:27017/shortie  # Replace with your MongoDB URI  
 REDIS_URL=redis://localhost:6379  # Replace with your Redis URL  
@@ -71,8 +73,12 @@ BASE_URL=http://localhost:3000
 AUTH_SECRET=ABCABCABCABACC # Replace with your own auth secret  
 AUTH_GOOGLE_ID=ABCABCABCABACC # Replace with your own google web client ID  
 AUTH_GOOGLE_SECRET=ABCABCABCABACC # Replace with your own google web client secret  
+
+# These 3 are build time, so, they go in your shell profile / through export command / etc.
 MAXMIND_LICENSE_KEY=ABCABCABCABACC # get from [Maxmind Website](https://www.maxmind.com/en/geoip-demo)  
 DOCKER_USERNAME=ABCABCABCABACC  # only required to label docker image and push to docker hub  
+LATEST_TAG="latest" # replace with your of the docker image
+```
   
 
    * For production, use a .env.production file and configure it as needed.  Remember to copy it to the Docker container.

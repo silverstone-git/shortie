@@ -31,7 +31,7 @@ jobs:
           context: .
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/shortie:${{ github.sha }}
-          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/shortie:${{ githu.sha }}
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/shortie:${{ github.sha }}
           cache-to: type=inline
           build-args: |
             MAXMIND_LICENSE_KEY=${{ secrets.MAXMIND_LICENSE_KEY }}

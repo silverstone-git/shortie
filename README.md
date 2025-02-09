@@ -1,5 +1,7 @@
 # Shortie URL Shortener API
 
+[![CI/CD](https://github.com/silverstone-git/shortie/actions/workflows/deploy.yml/badge.svg)](https://github.com/silverstone-git/shortie/actions/workflows/deploy.yml)
+
 This is the API for Shortie, a URL shortening service that allows users to create short URLs from long URLs and provides analytics for tracking clicks.
 
 ## Table of Contents

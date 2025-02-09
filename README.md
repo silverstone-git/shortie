@@ -60,17 +60,20 @@ Shortie simplifies long URLs into shorter, more manageable links.  It also provi
 ```
 
  * Configure environment variables:
-   * Create a .env file in the project root for local development.  Example:
-     NODE_ENV=development
-PORT=3000
-DATABASE_URL=mongodb://localhost:27017/shortie  # Replace with your MongoDB URI
-REDIS_URL=redis://localhost:6379  # Replace with your Redis URL
-PORT=3000
-BASE_URL=http://localhost:3000
-AUTH_SECRET=ABCABCABCABACC # Replace with your own auth secret
-AUTH_GOOGLE_ID=ABCABCABCABACC # Replace with your own google web client ID
-AUTH_GOOGLE_SECRET=ABCABCABCABACC # Replace with your own google web client secret
-
+   * Create a .env file in the project root for local development (__important__) and/or put them in your shell config.  
+     Example:  
+     NODE_ENV=development  
+PORT=3000  
+DATABASE_URL=mongodb://localhost:27017/shortie  # Replace with your MongoDB URI  
+REDIS_URL=redis://localhost:6379  # Replace with your Redis URL  
+PORT=3000  
+BASE_URL=http://localhost:3000  
+AUTH_SECRET=ABCABCABCABACC # Replace with your own auth secret  
+AUTH_GOOGLE_ID=ABCABCABCABACC # Replace with your own google web client ID  
+AUTH_GOOGLE_SECRET=ABCABCABCABACC # Replace with your own google web client secret  
+MAXMIND_LICENSE_KEY=ABCABCABCABACC # get from [Maxmind Website](https://www.maxmind.com/en/geoip-demo)  
+DOCKER_USERNAME=ABCABCABCABACC  # only required to label docker image and push to docker hub  
+  
 
    * For production, use a .env.production file and configure it as needed.  Remember to copy it to the Docker container.
 

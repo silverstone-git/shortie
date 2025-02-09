@@ -53,10 +53,10 @@ jobs:
           username: ${{ secrets.DO_USERNAME }}
           key: ${{ secrets.DO_PRIVATE_KEY }}
           script: |
-            mkdir ./projects/shortie
+            mkdir -p ./projects/shortie
             cd ./projects/shortie
             touch .env.production
-            echo ${{ secrets.DOCKER_TOKEN }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+            echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
             curl -L -o ./docker-compose.yaml https://raw.githubusercontent.com/silverstone-git/shortie/main/docker-compose.yaml
             docker-compose pull
             docker-compose down

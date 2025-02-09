@@ -14,7 +14,7 @@ services:
       - NODE_ENV=${NODE_ENV:-production} # Default to 'production' if not set
       - PORT=7871
     env_file:
-      - .env
+      - .env.production
     networks:
       - rednet
   redis:

@@ -4,8 +4,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        - MAXMIND_LICENSE_KEY=${MAXMIND_LICENSE_KEY}
+      # args:
+      #   - MAXMIND_LICENSE_KEY=${MAXMIND_LICENSE_KEY}
     ports:
       - "7871:7871"
     depends_on:

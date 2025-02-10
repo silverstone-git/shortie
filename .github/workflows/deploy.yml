@@ -30,11 +30,11 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/shortie:${{ github.sha }}
-          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/shortie:${{ github.sha }}
+          tags: ${{ secrets.DOCKER_USERNAME }}/shortie:${{ github.ref_name }}
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/shortie:${{ github.ref_name }}
           cache-to: type=inline
-          build-args: |
-            MAXMIND_LICENSE_KEY=${{ secrets.MAXMIND_LICENSE_KEY }}
+          # build-args: |
+          #   MAXMIND_LICENSE_KEY=${{ secrets.MAXMIND_LICENSE_KEY }}
 
       -
         name: Deploy to DigitalOcean
@@ -48,9 +48,8 @@ jobs:
             cd ./projects/shortie
             touch .env.production
             source ~/.bashrc
-            export MAXMIND_LICENSE_KEY=${{ secrets.MAXMIND_LICENSE_KEY }}
             export DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
-            export LATEST_TAG=${{ github.sha }}
+            export LATEST_TAG=${{ github.ref_name }}
             echo "AUTH_GOOGLE_ID=${{ secrets.AUTH_GOOGLE_ID }}" >> .env.production
             echo "AUTH_GOOGLE_SECRET=${{ secrets.AUTH_GOOGLE_SECRET }}" >> .env.production
             echo "AUTH_SECRET=${{ secrets.AUTH_SECRET }}" >> .env.production

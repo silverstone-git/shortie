@@ -12,6 +12,14 @@ paths:
         200:
           description: Successfully served the OAuth login page
 
+  /:
+    get:
+      description: Home page showing Auth information
+      responses:
+        200:
+          description: Home page with User Object and cookies header string
+          schema:
+            type: string
 
   /{alias}:
     get:

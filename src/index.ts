@@ -27,16 +27,22 @@ app.use("/api/auth/*", ExpressAuth(authUtils.authOptions))
 //auth check is done in the routers separately, if to be kept private
 app.use(authMiddleware.authSession)
 
+const showAuth = async (req: e.Request, res: e.Response) => {
+    res.send(`<h2>${JSON.stringify(res.locals.session)}</h2>
+      <p>${req.header('Cookie')}</p>
+    `)
+    return;
+}
+
+app.get('/', async (req: e.Request, res: e.Response) => {
+  await showAuth(req, res);
+})
 
 app.get('/:alias', async (req: e.Request, res: e.Response) => {
   const alias = req.params.alias;
   console.log("alias is: ", alias);
   if(!alias) {
-    console.log("no alias, returning home");
-    // we are at the home page, show the user info here if logged in
-    res.send(`<h2>${JSON.stringify(res.locals.session)}</h2>
-      <p>${req.header('Cookie')}</p>
-    `)
+    await showAuth(req, res);
     return;
   }
 

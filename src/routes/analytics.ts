@@ -23,27 +23,19 @@ router.get('/:alias', async (req, res) => {
       return
     }
 
-    const url = await db?.collection('urls').findOne({ alias });
+    const analytics = await db
+      ?.collection('analytics')
+      .find({ alias, urlBy: res.locals.session.user.email.trim() })
+      .toArray();
 
-    console.log("analyzing your alias...");
-    if (!url) {
-      res.status(404).json({ error: 'URL not found' });
+    if (!analytics || analytics.length == 0) {
+      //res.status(404).json({ error: 'URL not found' });
+      res.status(404).json({'error': 'Please give an alias that you made using this API'})
       return 
     }
-
-    if(url.createdBy.trim() == res.locals.session.user.email.trim()) {
-      // the analytics are made by this user only
-
-
-      const analytics = await db?.collection('analytics').find({ alias }).toArray();
-
-      const analysis = await analyticUtils.analyze(analytics);
-      res.status(200).json(analysis);
-    } else {
-      // 403
-      console.log("bugger off");
-      res.status(403).json({'error': 'Please give an alias that you made using this API'})
-    }
+    console.log("analyzing your alias...");
+    const analysis = await analyticUtils.analyze(analytics);
+    res.status(200).json(analysis);
 
   } catch (err) {
     console.log(err);
@@ -91,19 +83,13 @@ router.get('/topic/:topic', async (req, res) => {
     }
     console.log("topic is: ", topic);
 
-    let analytics = await db?.collection('analytics').find({ urlBy: res.locals.session.user.email }).toArray();
+    let analytics = await db
+      ?.collection('analytics')
+      .find({ urlBy: res.locals.session.user.email, topic: topic })
+      .toArray();
 
     if (!analytics || analytics.length == 0) {
       res.status(404).json({ error: 'Analytics not found' });
-      return 
-    }
-
-
-
-    analytics = analytics.filter((analytic: any) => analytic.topic == topic)
-
-    if (!analytics || analytics.length == 0) {
-      res.status(404).json({ error: 'Analytics for this topic not found' });
       return 
     }
 

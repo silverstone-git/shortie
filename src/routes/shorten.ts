@@ -5,6 +5,10 @@ import authMiddleware from '@/middlewares/auth.middleware';
 import serverSetup from '@/utils/serverSetup';
 import mongoClient from '@/utils/mongodb';
 
+const TOPIC_LENGTH_LIMIT = 50;
+const ALIAS_LENGTH_LIMIT = 50;
+const LONG_URL_LENGTH_LIMIT = 1000;
+
 const router = e.Router();
 router.use(authMiddleware.authenticatedUser);
 
@@ -22,8 +26,16 @@ router.post('/', async (req: e.Request, res: e.Response) => {
     console.log(customAlias);
     console.log(topic);
 
-    if(topic.includes(';')) {
+    if(topic.includes(';') || topic.trim().length > TOPIC_LENGTH_LIMIT || topic.trim().length < 5) {
       res.status(400).json({error: 'Please enter a better topic name'})
+      return;
+    }
+    if(customAlias.includes('overall') || customAlias.trim().length > ALIAS_LENGTH_LIMIT || customAlias.trim().length < 5) {
+      res.status(400).json({error: 'Please enter a better custom alias'})
+      return;
+    }
+    if(longUrl.trim().length > LONG_URL_LENGTH_LIMIT || longUrl.trim().length < 4) {
+      res.status(400).json({error: 'Please enter a better long URL'})
       return;
     }
 

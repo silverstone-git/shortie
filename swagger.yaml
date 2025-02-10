@@ -9,76 +9,180 @@ paths:
       summary: Get all the login methods
       description: OAuth login portal to return cookies in the home page, for further authorization
       response:
-        '200':
+        200:
           description: Successfully served the OAuth login page
 
-  /:
-    get:
-      summary: Get the user info and site cookies
-      description: Fetch the user info and site cookies for further authorization; null and undefined otherwise
-      response:
-        '200':
-          description: Successfully served the Home Page
-          schema:
-            type: string
 
   /{alias}:
     get:
+      parameters:
+        - in: path 
+          name: alias
+          scheme: string
       summary: Gets the url corresponding to the given alias
       description: Fetches the url corresponding to the given alias, if exists
       responses:
-        '309'
+        200:
+          summary: alias is empty => Get the user info and site cookies
+          description: Fetch the user info and site cookies for further authorization; Nnull and undefined otherwise
+          schema:
+            type: string
+        404:
+          description: URL for the given alias not found
+          schema:
+            type: object
+            example: { "error" : "url for the alias not found" }
+          properties:
+            error:
+              type: string
+        301:
+          description: Redirect to the corresponding long URL
+        500:
+          description: Internal Server Error
+          schema:
+            type: object
+            example: { "error" : "Server error" }
+          properties:
+            error:
+              type: string
+
+
+  /api/analytics/topic/{topic}:
+    get:
+      description: Get the topic wise analytics
+      parameters:
+        - in: path 
+          name: topic
+          scheme: string
+      responses:
+        400:
+          description: No topic provided in path
+          schema:
+            type: object
+            example: { "error" : "No topic in path" }
+          properties:
+            error:
+              type: string
+        404:
+          description: No analytics found for this topic
+          schema:
+            type: object
+            example: { "error" : "No clicks for the topic" }
+          properties:
+            error:
+              type: string
+        500:
+          description: Unhandled error
+          schema:
+            type: object
+            example: { "error" : "Something unhandled" }
+          properties:
+            error:
+              type: string
+        200:
+          description: Analytics given back
+          schema:
+            type: object
+            example: {"totalClicks": 4, "uniqueUsers": 10, "clicksByDate": {"2020-11-21": 14, "2020-11-22": 17}, "clicksByOS": {"Linux": 14, "Android": 587, "macOS": 87, "iPhone": 204, "Windows": 329, "Unknown": 37}, "clicksByLocation": {"ttbg": 14, "7zzz": 587}}
+          properties:
+            totalClicks:
+              description: Gives the total clicks
+              type: integer
+              example: 4
+            uniqueUsers:
+              description: Gives the no. of unique users who clicked
+              type: integer
+              example: 10
+            clicksByDate:
+              description: Gives the amount of clicks for each date
+              type: object
+              example: {"2020-11-21": 14, "2020-11-22": 17}
+            clicksByOS:
+              description: Gives the amount of clicks for each OS
+              type: object
+              example: {"Linux": 14, "Android": 587, "macOS": 87, "iPhone": 204, "Windows": 329, "Unknown": 37}
+            clicksByLocation:
+              description: Gives the amount of clicks for each neighbour block
+              type: object
+              example: {"ttbg": 14, "7zzz": 587}
+
 
   /api/analytics/{alias}:
     get:
-      summary: Get the overall analytics
+      summary: Get the overall analytics, or for the given alias if alias isnt 'overall'
       description: Fetch the metrics relevant to the alias
       parameters:
         - in: path 
           name: alias
           scheme: string
       responses:
-        '400':
-          summary: No alias provided in path
+        400:
+          description: No alias provided in path
           schema:
             type: object
+            example: {"error": "No alias in path"}
           properties:
             error:
               type: string
-        '404':
-          summary: No url found for the given alias
+              example: No alias path
+        404:
+          description: No url found for the given alias / No analytics found
           schema:
             type: object
+            example: {"error": "Error"}
           properties:
             error:
               type: string
-        '500':
-          summary: Internal Server Error
+              example: error
+        500:
+          description: Internal Server Error
           schema:
             type: object
+            example: {"error": "Error"}
           properties:
             error:
               type: string
-        '200':
-          summary: Analytics given back
+        200:
+          description: Analytics given back
           schema:
             type: object
+            example: {"totalClicks": 4, "uniqueUsers": 10, "clicksByDate": {"2020-11-21": 14, "2020-11-22": 17}, "clicksByOS": {"Linux": 14, "Android": 587, "macOS": 87, "iPhone": 204, "Windows": 329, "Unknown": 37}, "clicksByLocation": {"ttbg": 14, "7zzz": 587}}
           properties:
+            totalUrls:
+              description: Total no. of urls for which the analysis has been done
+              type: integer
+              example: 9
             totalClicks:
-              summary: Gives the total clicks
-              type: number
+              description: Gives the total clicks
+              type: integer
+              example: 41
             uniqueUsers:
-              summary: Gives the no. of unique users who clicked
-              type: number
+              description: Gives the no. of unique users who clicked
+              type: integer
+              example: 29
             clicksByDate:
-              summary: Gives the amount of clicks for each date
+              description: Gives the amount of clicks for each date
               type: object
+              example: {"2020-11-21": 14, "2020-11-22": 17}
             clicksByOS:
-              summary: Gives the amount of clicks for each OS
+              description: Gives the amount of clicks for each OS
               type: string
+              example: {"Linux": 14, "Android": 587, "macOS": 87, "iPhone": 204, "Windows": 329, "Unknown": 37}
             clicksByLocation:
-              summary: Gives the amount of clicks for each neighbour block
+              description: Gives the amount of clicks for each neighbour block
               type: object
+              example: {"ttbg": 14, "7zzz": 587}
+
+  /api/shorten/{alias}:
+    get:
+      parameters:
+        - in: path 
+          name: alias
+          scheme: string
+      description: Go to the long URL corresponding to the given alias
+      responses:
+        307:
+          description: Redirects to /alias, it takes care of the redirect further
 
   /api/shorten:
     post:
@@ -99,27 +203,38 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        201:
           description: Successfully created short URL
           schema:
             type: object
+            example: {"shortUrl": "https://sh.aryan.cfd/myCustomAlias", "createdAt": 1739163792326}
             properties:
               shortUrl:
                 type: string
               createdAt:
-                type: string
-                format: date-time
-        '409':
-          description: The alias already exists
+                type: integer
+        400:
+          summary: Bad Topic name
+          description: Topic name contains ';' which isnt allowed because it needs to be used as a delimiter for parsing redis value linked to alias key. or, alias contains 'overall' keyword; or, any of three inputs are too lengthy
           schema:
             type: object
+            example: {"error": "Bad topic name"}
             properties:
               error:
                 type: string
-        '500':
+        409:
+          description: The alias already exists
+          schema:
+            type: object
+            example: {"error": "Already exists"}
+            properties:
+              error:
+                type: string
+        500:
           description: Internal Server Error
           schema:
             type: object
+            example: {"error": "Server error"}
             properties:
               error:
                 type: string

@@ -28,13 +28,6 @@ app.use("/api/auth/*", ExpressAuth(authUtils.authOptions))
 app.use(authMiddleware.authSession)
 
 
-app.get('/', (req, res) => {
-  res.send(`<h2>${JSON.stringify(res.locals.session)}</h2>
-    <p>${req.header('Cookie')}</p>
-`)
-})
-
-
 app.get('/:alias', async (req: e.Request, res: e.Response) => {
   const alias = req.params.alias;
   console.log("alias is: ", alias);
@@ -70,7 +63,7 @@ app.get('/:alias', async (req: e.Request, res: e.Response) => {
       const url: IUrl = await db.collection('urls').findOne({alias});
       if(!url) {
         // nowhere to be found
-        res.status(404).json({ error: 'URL not found' });
+        res.status(404).json({ error: 'URL for the given alias not found' });
         return
       }
 

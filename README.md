@@ -42,8 +42,8 @@ Shortie simplifies long URLs into shorter, more manageable links.  It also provi
 
 - Node.js (v20 or higher recommended)
 - npm or yarn
-- MongoDB (You'll need a MongoDB instance running)
-- Redis (You'll need a Redis instance running)
+- MongoDB (running instance)
+- Redis (running instance)
 
 ### Installation
 
@@ -75,15 +75,16 @@ BASE_URL=http://localhost:3000
 AUTH_SECRET=ABCABCABCABACC # Replace with your own auth secret  
 AUTH_GOOGLE_ID=ABCABCABCABACC # Replace with your own google web client ID  
 AUTH_GOOGLE_SECRET=ABCABCABCABACC # Replace with your own google web client secret  
+AUTH_TRUST_HOST=http://localhost:3000
 
-# These 3 are build time, so, they go in your shell profile / through export command / etc.
-MAXMIND_LICENSE_KEY=ABCABCABCABACC # get from [Maxmind Website](https://www.maxmind.com/en/geoip-demo)  
-DOCKER_USERNAME=ABCABCABCABACC  # only required to label docker image and push to docker hub  
-LATEST_TAG="latest" # replace with your of the docker image
+# These 3 are build time vars, so, they go in your shell profile / through export command / etc.
+MAXMIND_LICENSE_KEY=ABCABCABCABACC # optional. get from maxmind.com/en/geoip-demo  
+DOCKER_USERNAME=ABCABCABCABACC  # required, put in anything if you dont have a dockerhub account  
+LATEST_TAG="latest" # required. replace with your own version/tag name of the desired docker image  
 ```
   
 
-   * For production, use a .env.production file and configure it as needed.  Remember to copy it to the Docker container.
+   * For running docker locally or in production, use a .env.production file and configure it as needed.  
 
 ### Running the API
 ### Local Development:
@@ -105,22 +106,27 @@ npm run dev  # Uses nodemon for automatic restarts
 - Log in by visiting /api/auth/signin
 - Copy the cookie string shown at home page into your request's Cookie Header
 - Shorten URLs and Analyze the visitors
-- Profit
+- Profit  
+
 
 ## API Endpoints
-The API is documented using Swagger.  You can access the Swagger UI at /api-docs after starting the server.  The following are the main endpoints:
+The API is documented using Swagger.  You can access the Swagger UI at /api/docs after starting the server.  The following are the main endpoints:
 ### Authentication
  * GET /api/auth/signin: Redirects to the OAuth login page.
 ### Home Page
- * GET /: Returns the home page.
+ * GET /: Returns the home page, shows authenticated user information
 ### URL Redirection
  * GET /{alias}: Redirects to the original URL associated with the given alias.
 ### Analytics
+ * GET /api/analytics/overall: Overall analytics for the user generated links
  * GET /api/analytics/{alias}: Retrieves analytics for the given alias.
+ * GET /api/analytics/topic/{topic}: Retrieves analytics for the given topic.
 ### Shorten URL
  * POST /api/shorten: Creates a new short URL
+ * GET /api/shorten/{alias}: hops you through to your desired long URL, corresponding to alias
 ### Docs
-- GET /api/docs: Documentation shown in html page using swagger
+ * GET /api/docs: Documentation shown in html page using swagger  
+
 
 
 ## Technologies Used
@@ -152,12 +158,16 @@ npm test
 
 
 ## Deployment
-The API is designed to be deployed using Docker and Docker Compose.  See the Running the API section for instructions.
-Contributing
-Contributions are welcome! Please open an issue or submit a pull request.
+The API is designed to be deployed using Docker and Docker Compose.  See the Running the API section for instructions.  
+
+
+## Contributing
+Contributions are welcome! Please open an issue or submit a pull request.  
+
 
 ## License
-[MIT](https://mit-license.org)
+[MIT](https://mit-license.org)  
+
 
 ## Key Improvements and Explanations
 
@@ -171,7 +181,9 @@ This project has undergone several key improvements, focusing on code organizati
  * Location Grouping:  A location grouping feature has been added, using ngeohash to group clicks from nearby areas (e.g., within a country or region) for more meaningful location-based analytics.
  * Improved URL Handling: Redundant fields in the URL data have been removed, simplifying the data model.
  * Authentication with Auth.js: The authentication system has been migrated to Auth.js, providing a more robust, secure, and feature-rich authentication solution.  This replaces the previous manual OAuth implementation.
- * User Model Adjustments: The user model has been updated to align with the Google user payload, simplifying user data handling.
+ * User Model Adjustments: The user model has been updated to align with the Google user payload, simplifying user data handling.  
+
+
 ### Production Readiness:
  * Import Alias Fix: tsc-alias is used to resolve import aliases in production builds, ensuring that the application works correctly after compilation.
  * Docker Setup: Docker setup has been improved and made compatible with environment variables, allowing for easier deployment and configuration in different environments.
@@ -180,7 +192,8 @@ This project has undergone several key improvements, focusing on code organizati
  * trust proxy Setting: The trust proxy setting in Express.js has been correctly configured to 1 to enhance security when running behind a reverse proxy like Nginx.  This mitigates the risk of IP spoofing attacks on rate limiting.
  * Redis Connection Fix: Issues with the Redis connection have been resolved, ensuring reliable communication with the Redis database.
  * Enhanced Logging: More logging has been added to improve debugging and monitoring in production.
- * Package Lock Ignored: The package-lock.json file is now ignored in version control to allow flexibility in dependency updates. (This is generally not recommended unless you have a specific reason to do so).
+ * Package Lock Ignored: The package-lock.json file is now ignored in version control to allow flexibility in dependency updates.  
+
 ### Bug Fixes and Debugging:
  * Docker Configuration: Issues with the Docker environment were resolved with a lot of trial and error
  * Type Error Fixes: Several type errors have been corrected to improve code stability and prevent runtime issues.
@@ -188,6 +201,5 @@ This project has undergone several key improvements, focusing on code organizati
 ### Other Deliberate Choices / Challenges:
  * Mongoose Removed: Mongoose has been removed, potentially simplifying the database interaction and improving performance.  MongoDB's native driver is now used.
  * type: 'module' setting in package.json: The entire API has been made an EcmaScript Module to be compatible with modern JS runtimes and libraries, backwards compatible with CommonJS
- * Global Type File Updates: The global type file has been updated with more modules to improve type safety across the project
- 
-These improvements represent significant progress toward a robust, scalable, and production-ready URL shortener API. The focus on code organization, enhanced functionality, and production best practices makes this a much more maintainable and deployable project.
+ * Global Type File Updates: The global type file has been updated with more modules to improve type safety across the project  
+

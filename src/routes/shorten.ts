@@ -55,7 +55,7 @@ router.post('/', async (req: e.Request, res: e.Response) => {
     console.log("result of url updateOne: ", result)
     if (result.upsertedCount == 1) {
       redisDb.connect().then(() => {
-        redisDb.set(alias, longUrl).then(() => {
+        redisDb.set(alias, `${longUrl};${url.createdBy};${url.topic}`).then(() => {
           redisDb.disconnect().then(() => {
             console.log("redis set!")
           })

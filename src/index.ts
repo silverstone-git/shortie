@@ -84,6 +84,7 @@ app.get('/:alias', async (req: e.Request, res: e.Response) => {
     } else {
       // cache hit!
       console.log("cache hit");
+      console.log("redisGot", redisGot);
       [ longUrl, urlBy, topic] = redisGot.split(';');
 
 
@@ -129,10 +130,8 @@ app.get('/:alias', async (req: e.Request, res: e.Response) => {
       topic
     };
 
-    console.log(analytic);
 
     const result = await db?.collection('analytics').insertOne(analytic);
-    console.log("analytics result: ", result);
 
     res.redirect(301, longUrl);
   } catch (err) {

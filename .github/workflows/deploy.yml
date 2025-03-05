@@ -37,15 +37,15 @@ jobs:
           #   MAXMIND_LICENSE_KEY=${{ secrets.MAXMIND_LICENSE_KEY }}
 
       -
-        name: Deploy to DigitalOcean
+        name: Deploy to Azure
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.DO_HOST }}
-          username: ${{ secrets.DO_USERNAME }}
-          key: ${{ secrets.DO_PRIVATE_KEY }}
+          host: ${{ secrets.AZ_HOST }}
+          username: ${{ secrets.AZ_USERNAME }}
+          key: ${{ secrets.AZ_KEY }}
           script: |
-            mkdir -p ./projects/shortie
-            cd ./projects/shortie
+            mkdir -p ./web/shortie
+            cd ./web/shortie
             touch .env.production
             source ~/.bashrc
             export DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}

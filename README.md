@@ -102,6 +102,29 @@ npm run dev  # Uses nodemon for automatic restarts
    docker-compose up -d
 ```
 
+### Install using Docker
+
+- As an alternative to cloning the repository and installing packages, you can directly install and run using the [docker image](https://hub.docker.com/r/cyt0/shortie)
+
+- Download the Docker Compose and create the `.env.production` file
+
+    ```bash
+    curl -L -o ./docker-compose.yaml https://raw.githubusercontent.com/silverstone-git/shortie/main/docker-compose.yaml
+    touch .env.production
+    ```
+
+- Edit the `.env.production` to your liking by referring to the Variables in [Installation](#installation)
+
+- Pull and Up the [docker image](https://hub.docker.com/r/cyt0/shortie)
+
+    ```bash
+    docker-compose pull
+    docker-compose down
+    docker-compose up -d
+    ```
+
+
+
 ### Next steps
 - Log in by visiting /api/auth/signin
 - Copy the cookie string shown at home page into your request's Cookie Header

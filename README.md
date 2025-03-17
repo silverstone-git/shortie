@@ -80,7 +80,7 @@ AUTH_TRUST_HOST=http://localhost:3000
 # These 3 are build time vars, so, they go in your shell profile / through export command / etc.
 MAXMIND_LICENSE_KEY=ABCABCABCABACC # optional. get from maxmind.com/en/geoip-demo  
 DOCKER_USERNAME=ABCABCABCABACC  # required, put in anything if you dont have a dockerhub account  
-LATEST_TAG="latest" # required. replace with your own version/tag name of the desired docker image  
+SHORTIE_TAG="main" # required. replace with your own version/tag name of the desired docker image  
 ```
   
 

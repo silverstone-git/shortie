@@ -49,7 +49,7 @@ jobs:
             touch .env.production
             source ~/.bashrc
             export DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
-            export LATEST_TAG=${{ github.ref_name }}
+            export SHORTIE_TAG=${{ github.ref_name }}
             echo "AUTH_GOOGLE_ID=${{ secrets.AUTH_GOOGLE_ID }}" >> .env.production
             echo "AUTH_GOOGLE_SECRET=${{ secrets.AUTH_GOOGLE_SECRET }}" >> .env.production
             echo "AUTH_SECRET=${{ secrets.AUTH_SECRET }}" >> .env.production

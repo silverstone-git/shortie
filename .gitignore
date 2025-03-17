@@ -1,7 +1,5 @@
 .env
 .env.production
-package-lock.json
 node_modules/
-dist/
 query_payload.sh
 .secrets

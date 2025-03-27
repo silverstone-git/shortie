@@ -9,7 +9,8 @@ import mongoClient from "../utils/mongodb.js";
 //})
 const authOptions = {
     providers: [
-        Google
+        Google({ clientId: process.env.AUTH_GOOGLE_ID,
+            clientSecret: process.env.AUTH_GOOGLE_SECRET })
     ],
     adapter: MongoDBAdapter(mongoClient)
 };

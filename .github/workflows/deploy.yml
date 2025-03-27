@@ -50,10 +50,10 @@ jobs:
             source ~/.bashrc
             export DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
             export SHORTIE_TAG=${{ github.ref_name }}
-            echo "AUTH_GOOGLE_ID=${{ secrets.AUTH_GOOGLE_ID }}" >> .env.production
+            echo "AUTH_GOOGLE_ID=${{ secrets.AUTH_GOOGLE_ID }}" > .env.production
             echo "AUTH_GOOGLE_SECRET=${{ secrets.AUTH_GOOGLE_SECRET }}" >> .env.production
             echo "AUTH_SECRET=${{ secrets.AUTH_SECRET }}" >> .env.production
-            echo "AUTH_TRUST_HOST=${{ secrets.AUTH_TRUST_HOST }}" >> .env.production
+            echo "AUTH_TRUST_HOST=true" >> .env.production
             echo "BASE_URL=${{ secrets.BASE_URL }}" >> .env.production
             echo "DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}" >> .env.production
             echo "MONGODB_URI=${{ secrets.MONGODB_URI }}" >> .env.production

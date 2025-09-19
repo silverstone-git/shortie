@@ -27,7 +27,12 @@ async function closeConnection(mongoClient: MongoClient) {
 
 const getCache: () => Promise<Redis.RedisClientType> = async () => {
   return Redis.createClient({
-    url: process.env?.REDIS_URL ?? "http://localhost:6379"
+	username: process.env?.REDIS_USERNAME,
+	password: process.env?.REDIS_PASSWORD,
+	socket: {
+		host: process.env?.REDIS_HOST,
+		port: Number(process.env?.REDIS_PORT)
+	}
   });
 }
 

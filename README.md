@@ -1,6 +1,6 @@
 # Shortie URL Shortener API
 
-[![CI/CD](https://github.com/silverstone-git/shortie/actions/workflows/deploy.yml/badge.svg)](https://github.com/silverstone-git/shortie/actions/workflows/deploy.yml)
+[![CI pipeline](https://github.com/silverstone-git/shortie/actions/workflows/deploy.yml/badge.svg)](https://github.com/silverstone-git/shortie/actions/workflows/deploy.yml)
 
 This is the API for Shortie, a URL shortening service that allows users to create short URLs from long URLs and provides analytics for tracking clicks.
 
@@ -68,17 +68,18 @@ npm install  # Or yarn install
 ```bash
 NODE_ENV=development  
 PORT=3000  
-DATABASE_URL=mongodb://localhost:27017/shortie  # Replace with your MongoDB URI  
-REDIS_URL=redis://localhost:6379  # Replace with your Redis URL  
-PORT=3000  
+MONGODB_URI=mongodb://localhost:27017/shortie
 BASE_URL=http://localhost:3000  
 AUTH_SECRET=ABCABCABCABACC # Replace with your own auth secret  
 AUTH_GOOGLE_ID=ABCABCABCABACC # Replace with your own google web client ID  
 AUTH_GOOGLE_SECRET=ABCABCABCABACC # Replace with your own google web client secret  
 AUTH_TRUST_HOST=http://localhost:3000
+REDIS_USERNAME=<USERNAME_FOR_ACCESS>
+REDIS_PASSWORD=<PASSWORD_IF_ANY>
+REDIS_HOST=<YOUR_REDIS_HOST>
+REDIS_PORT=8000
 
 # These 3 are build time vars, so, they go in your shell profile / through export command / etc.
-MAXMIND_LICENSE_KEY=ABCABCABCABACC # optional. get from maxmind.com/en/geoip-demo  
 DOCKER_USERNAME=ABCABCABCABACC  # required, put in anything if you dont have a dockerhub account  
 SHORTIE_TAG="main" # required. replace with your own version/tag name of the desired docker image  
 ```

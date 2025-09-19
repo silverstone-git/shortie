@@ -36,32 +36,32 @@ jobs:
           # build-args: |
           #   MAXMIND_LICENSE_KEY=${{ secrets.MAXMIND_LICENSE_KEY }}
 
-      -
-        name: Deploy to Azure
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.AZ_HOST }}
-          username: ${{ secrets.AZ_USERNAME }}
-          key: ${{ secrets.AZ_KEY }}
-          script: |
-            mkdir -p ./web/shortie
-            cd ./web/shortie
-            touch .env.production
-            source ~/.bashrc
-            export DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
-            export SHORTIE_TAG=${{ github.ref_name }}
-            echo "AUTH_GOOGLE_ID=${{ secrets.AUTH_GOOGLE_ID }}" > .env.production
-            echo "AUTH_GOOGLE_SECRET=${{ secrets.AUTH_GOOGLE_SECRET }}" >> .env.production
-            echo "AUTH_SECRET=${{ secrets.AUTH_SECRET }}" >> .env.production
-            echo "AUTH_TRUST_HOST=true" >> .env.production
-            echo "BASE_URL=${{ secrets.BASE_URL }}" >> .env.production
-            echo "DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}" >> .env.production
-            echo "MONGODB_URI=${{ secrets.MONGODB_URI }}" >> .env.production
-            echo "PORT=${{ secrets.PORT }}" >> .env.production
-            echo "REDIS_URL=${{ secrets.REDIS_URL }}" >> .env.production
-            echo "NODE_ENV="production"" >> .env.production
-            echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-            curl -L -o ./docker-compose.yaml https://raw.githubusercontent.com/silverstone-git/shortie/main/docker-compose.yaml
-            docker-compose pull
-            docker-compose down
-            docker-compose up -d
+      # -
+      #   name: Deploy to Azure
+      #   uses: appleboy/ssh-action@master
+      #   with:
+      #     host: ${{ secrets.AZ_HOST }}
+      #     username: ${{ secrets.AZ_USERNAME }}
+      #     key: ${{ secrets.AZ_KEY }}
+      #     script: |
+      #       mkdir -p ./web/shortie
+      #       cd ./web/shortie
+      #       touch .env.production
+      #       source ~/.bashrc
+      #       export DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
+      #       export SHORTIE_TAG=${{ github.ref_name }}
+      #       echo "AUTH_GOOGLE_ID=${{ secrets.AUTH_GOOGLE_ID }}" > .env.production
+      #       echo "AUTH_GOOGLE_SECRET=${{ secrets.AUTH_GOOGLE_SECRET }}" >> .env.production
+      #       echo "AUTH_SECRET=${{ secrets.AUTH_SECRET }}" >> .env.production
+      #       echo "AUTH_TRUST_HOST=true" >> .env.production
+      #       echo "BASE_URL=${{ secrets.BASE_URL }}" >> .env.production
+      #       echo "DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}" >> .env.production
+      #       echo "MONGODB_URI=${{ secrets.MONGODB_URI }}" >> .env.production
+      #       echo "PORT=${{ secrets.PORT }}" >> .env.production
+      #       echo "REDIS_URL=${{ secrets.REDIS_URL }}" >> .env.production
+      #       echo "NODE_ENV="production"" >> .env.production
+      #       echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+      #       curl -L -o ./docker-compose.yaml https://raw.githubusercontent.com/silverstone-git/shortie/main/docker-compose.yaml
+      #       docker-compose pull
+      #       docker-compose down
+      #       docker-compose up -d

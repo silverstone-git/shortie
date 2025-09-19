@@ -40,18 +40,18 @@ app.get('/', async (req: e.Request, res: e.Response) => {
 
 app.get('/:alias', async (req: e.Request, res: e.Response) => {
   const alias = req.params.alias;
-  console.log("alias is: ", alias);
   if(!alias) {
     await showAuth(req, res);
     return;
   }
 
   // we have an alias
-  console.log("getting cache")
+  // console.log("getting cache")
   const redisDb: RedisClientType = await serverSetup.getCache();
   const db = await serverSetup.getDb(mongoClient);
   try {
     const alias = req.params.alias;
+    // console.log("connecting to redis...")
     await redisDb.connect()
 
     // alias response contains longUrl, urlBy, topic

@@ -48,7 +48,9 @@ app.get('/:alias', async (req: e.Request, res: e.Response) => {
   // we have an alias
   // console.log("getting cache")
   
-  const plsdontlog: boolean = req.query.clean ? true : false;
+  const plsdontlog: boolean = 'clean' in req.query ? true : false;
+  console.log("req query was: ", plsdontlog)
+  console.log("plsdontlog was: ", plsdontlog)
 
   const redisDb: RedisClientType = await serverSetup.getCache();
   const db = await serverSetup.getDb(mongoClient);

@@ -47,6 +47,9 @@ app.get('/:alias', async (req: e.Request, res: e.Response) => {
 
   // we have an alias
   // console.log("getting cache")
+  
+  const plsdontlog: boolean = req.query.clean ? true : false;
+
   const redisDb: RedisClientType = await serverSetup.getCache();
   const db = await serverSetup.getDb(mongoClient);
   try {
@@ -82,56 +85,59 @@ app.get('/:alias', async (req: e.Request, res: e.Response) => {
         redisDb.disconnect();
       });
     } else {
+
       // cache hit!
       console.log("cache hit");
       console.log("redisGot", redisGot);
       [ longUrl, urlBy, topic] = redisGot.split(';');
+    }
+
+    
+    if (!plsdontlog) {
+	    const userAgentOg = req.header('user-agent').toLowerCase() || '';
+	    const userAgent = userAgentOg.toLowerCase();
+	    let os = 'Unknown';
+	    if (userAgent.includes('windows')) {
+	      os = 'Windows';
+	    } else if (userAgent.includes('iphone') || userAgent.includes('iphone os')) {
+	      os = 'iPhone';
+	    } else if (userAgent.includes('macintosh') || userAgent.includes('mac os')) {
+	      os = 'macOS';
+	    } else if (userAgent.includes('android')) {
+	      os = 'Android';
+	    } else if (userAgent.includes('linux')) {
+	      os = 'Linux';
+	    } else if (userAgent.includes('curl')) {
+	      os = 'Terminal';
+	    }
+
+	    const ip = req.ip || req.header('x-forwarded-for');
+	    var geo = geoip.lookup(ip);
 
 
+	    // log analytics
+	    const analytic: IAnalytic = {
+	      _id: undefined,
+	      timestamp: new Date(),
+	      userAgent: userAgentOg,
+
+	      location: {
+		lat: geo?.ll[0] ?? 0,
+		lng: geo?.ll[1] ?? 0
+	      },
+
+	      alias,
+	      os,
+	      ip,
+	      urlBy,
+	      topic
+	    };
+
+
+	    const result = await db?.collection('analytics').insertOne(analytic);
     }
 
 
-    const userAgentOg = req.header('user-agent').toLowerCase() || '';
-    const userAgent = userAgentOg.toLowerCase();
-    let os = 'Unknown';
-    if (userAgent.includes('windows')) {
-      os = 'Windows';
-    } else if (userAgent.includes('iphone') || userAgent.includes('iphone os')) {
-      os = 'iPhone';
-    } else if (userAgent.includes('macintosh') || userAgent.includes('mac os')) {
-      os = 'macOS';
-    } else if (userAgent.includes('android')) {
-      os = 'Android';
-    } else if (userAgent.includes('linux')) {
-      os = 'Linux';
-    } else if (userAgent.includes('curl')) {
-      os = 'Terminal';
-    }
-
-    const ip = req.ip || req.header('x-forwarded-for');
-    var geo = geoip.lookup(ip);
-
-
-    // log analytics
-    const analytic: IAnalytic = {
-      _id: undefined,
-      timestamp: new Date(),
-      userAgent: userAgentOg,
-
-      location: {
-        lat: geo?.ll[0] ?? 0,
-        lng: geo?.ll[1] ?? 0
-      },
-
-      alias,
-      os,
-      ip,
-      urlBy,
-      topic
-    };
-
-
-    const result = await db?.collection('analytics').insertOne(analytic);
 
     res.redirect(301, longUrl);
   } catch (err) {

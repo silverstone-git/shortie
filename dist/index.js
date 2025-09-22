@@ -40,17 +40,20 @@ app.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 app.get('/:alias', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
     const alias = req.params.alias;
-    console.log("alias is: ", alias);
     if (!alias) {
         yield showAuth(req, res);
         return;
     }
     // we have an alias
-    console.log("getting cache");
+    // console.log("getting cache")
+    const plsdontlog = 'clean' in req.query ? true : false;
+    console.log("req query was: ", plsdontlog);
+    console.log("plsdontlog was: ", plsdontlog);
     const redisDb = yield serverSetup.getCache();
     const db = yield serverSetup.getDb(mongoClient);
     try {
         const alias = req.params.alias;
+        // console.log("connecting to redis...")
         yield redisDb.connect();
         // alias response contains longUrl, urlBy, topic
         let longUrl, urlBy, topic;
@@ -80,45 +83,47 @@ app.get('/:alias', (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             console.log("redisGot", redisGot);
             [longUrl, urlBy, topic] = redisGot.split(';');
         }
-        const userAgentOg = req.header('user-agent').toLowerCase() || '';
-        const userAgent = userAgentOg.toLowerCase();
-        let os = 'Unknown';
-        if (userAgent.includes('windows')) {
-            os = 'Windows';
+        if (!plsdontlog) {
+            const userAgentOg = req.header('user-agent').toLowerCase() || '';
+            const userAgent = userAgentOg.toLowerCase();
+            let os = 'Unknown';
+            if (userAgent.includes('windows')) {
+                os = 'Windows';
+            }
+            else if (userAgent.includes('iphone') || userAgent.includes('iphone os')) {
+                os = 'iPhone';
+            }
+            else if (userAgent.includes('macintosh') || userAgent.includes('mac os')) {
+                os = 'macOS';
+            }
+            else if (userAgent.includes('android')) {
+                os = 'Android';
+            }
+            else if (userAgent.includes('linux')) {
+                os = 'Linux';
+            }
+            else if (userAgent.includes('curl')) {
+                os = 'Terminal';
+            }
+            const ip = req.ip || req.header('x-forwarded-for');
+            var geo = geoip.lookup(ip);
+            // log analytics
+            const analytic = {
+                _id: undefined,
+                timestamp: new Date(),
+                userAgent: userAgentOg,
+                location: {
+                    lat: (_a = geo === null || geo === void 0 ? void 0 : geo.ll[0]) !== null && _a !== void 0 ? _a : 0,
+                    lng: (_b = geo === null || geo === void 0 ? void 0 : geo.ll[1]) !== null && _b !== void 0 ? _b : 0
+                },
+                alias,
+                os,
+                ip,
+                urlBy,
+                topic
+            };
+            const result = yield (db === null || db === void 0 ? void 0 : db.collection('analytics').insertOne(analytic));
         }
-        else if (userAgent.includes('iphone') || userAgent.includes('iphone os')) {
-            os = 'iPhone';
-        }
-        else if (userAgent.includes('macintosh') || userAgent.includes('mac os')) {
-            os = 'macOS';
-        }
-        else if (userAgent.includes('android')) {
-            os = 'Android';
-        }
-        else if (userAgent.includes('linux')) {
-            os = 'Linux';
-        }
-        else if (userAgent.includes('curl')) {
-            os = 'Terminal';
-        }
-        const ip = req.ip || req.header('x-forwarded-for');
-        var geo = geoip.lookup(ip);
-        // log analytics
-        const analytic = {
-            _id: undefined,
-            timestamp: new Date(),
-            userAgent: userAgentOg,
-            location: {
-                lat: (_a = geo === null || geo === void 0 ? void 0 : geo.ll[0]) !== null && _a !== void 0 ? _a : 0,
-                lng: (_b = geo === null || geo === void 0 ? void 0 : geo.ll[1]) !== null && _b !== void 0 ? _b : 0
-            },
-            alias,
-            os,
-            ip,
-            urlBy,
-            topic
-        };
-        const result = yield (db === null || db === void 0 ? void 0 : db.collection('analytics').insertOne(analytic));
         res.redirect(301, longUrl);
     }
     catch (err) {

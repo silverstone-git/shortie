@@ -37,9 +37,15 @@ function closeConnection(mongoClient) {
 }
 ;
 const getCache = () => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b;
+    var _a;
     return Redis.createClient({
-        url: (_b = (_a = process.env) === null || _a === void 0 ? void 0 : _a.REDIS_URL) !== null && _b !== void 0 ? _b : "http://localhost:6379"
+        // username: process.env?.REDIS_USERNAME,
+        // password: process.env?.REDIS_PASSWORD,
+        // socket: {
+        // 	host: process.env?.REDIS_HOST,
+        // 	port: Number(process.env?.REDIS_PORT)
+        // }
+        url: (_a = process.env) === null || _a === void 0 ? void 0 : _a.REDIS_URL
     });
 });
 export default { getDb, getCache, closeConnection };
